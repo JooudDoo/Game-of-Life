@@ -1,8 +1,6 @@
 #include "utility.h"
 
-Frame::Frame() : width(0), height(0), data(NULL) {
-
-}
+Frame::Frame() : width(0), height(0), data(NULL) {}
 
 Frame::Frame(const SHORT& iWidth, const SHORT& iHeight, const FrameData& iData) : width(iWidth), height(iHeight), data(iData) {}
 

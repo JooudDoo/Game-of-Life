@@ -17,6 +17,12 @@
 #define CP 866
 #endif
 
+enum ConsoleCodes {
+	None,
+	quit,
+	pause
+};
+
 constexpr auto EMPTY_CELL = ' ';//'\xb0';
 constexpr auto OCCUPIED_CELL = '\xdb';
 

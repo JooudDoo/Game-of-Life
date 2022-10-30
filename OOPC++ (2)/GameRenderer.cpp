@@ -14,14 +14,14 @@ GameRenderer::GameRenderer(const SHORT& iWidth, const SHORT& iHeight) : consoleM
     renderBorder();
 }
 
-bool GameRenderer::checkPlayer() {
+ConsoleCodes GameRenderer::checkPlayer() {
     INPUT_RECORD irInBuf[128];
     DWORD cNumRead;
 
-    bool enabled = true;
+    ConsoleCodes enabled = None;
 
     if (!_kbhit())
-        return enabled;
+        return None;
 
     ReadConsoleInput(
         cInput,
@@ -51,16 +51,19 @@ bool GameRenderer::checkPlayer() {
     return enabled;
 }
 
-bool GameRenderer::keyboardHandler(const KEY_EVENT_RECORD& mr) {
+ConsoleCodes GameRenderer::keyboardHandler(const KEY_EVENT_RECORD& mr) {
     int keyPressed = mr.uChar.AsciiChar;
     switch (keyPressed) {
     case('q'):
     case('Q'):
-        return false;
+        return quit;
+    case('p'):
+    case('P'):
+        return pause;
     default:
         break;
     }
-    return true;
+    return None;
 }
 
 void GameRenderer::renderFrame(Frame& fr) {

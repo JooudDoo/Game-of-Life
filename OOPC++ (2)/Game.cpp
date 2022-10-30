@@ -7,17 +7,22 @@ LifeGame::LifeGame() : canvasHeight(HEIGHTDEFAULT), canvasWidth(WIDTHDEFAULT) {
 
 void LifeGame::runGame(const SHORT& FPS) {
 	DWORD delay = 1000 / FPS;
-	bool enabled = true;
-	while (enabled) {
-		renderFrame();
-		enabled = renderer.checkPlayer();
+	ConsoleCodes state = None;
+	bool simulate = true;
+	while (state != quit) {
+		renderFrame(simulate);
+		state = renderer.checkPlayer();
+		if (state == pause) { simulate = !simulate; }
 		Sleep(delay);
 	}
+	while (true) {
+		Sleep(delay * FPS * 100);
+	};
 }
 
-void LifeGame::renderFrame() {
+void LifeGame::renderFrame(const bool& isSimulate) {
+	if(isSimulate) logic.simulate();
 	renderer.renderFrame(logic.getField());
-	logic.simulate();
 }
 
 bool LifeGame::placeCell(const SHORT& x, const SHORT& y) {

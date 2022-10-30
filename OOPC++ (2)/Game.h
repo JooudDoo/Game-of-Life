@@ -18,7 +18,7 @@ public:
 	bool placeCell(const SHORT& x, const SHORT& y);
 	bool clearCell(const SHORT& x, const SHORT& y);
 	void runGame(const SHORT& FPS);
-	void renderFrame();
+	void renderFrame(const bool&);
 
 private:
 	GameLogic logic;

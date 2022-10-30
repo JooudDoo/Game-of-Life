@@ -8,7 +8,7 @@ public:
 	GameRenderer(const SHORT&, const SHORT&);
 	~GameRenderer() = default;
 
-	bool checkPlayer();
+	ConsoleCodes checkPlayer();
 
 	void renderFrame(Frame&);
 	void renderFrame(Field&);
@@ -18,7 +18,7 @@ private:
 	void InitConsole();
 	void InitCanvas();
 	void drawSymbol(const SHORT& x, const SHORT& y, CHAR_T sym);
-	bool keyboardHandler(const KEY_EVENT_RECORD&);
+	ConsoleCodes keyboardHandler(const KEY_EVENT_RECORD&);
 
 	Frame prevFrame;
 	HANDLE cInput;
