@@ -1,12 +1,12 @@
-#include "GameRenderer.h"
+﻿#include "GameRenderer.h"
 #include "GameLogic.h"
 #include "Game.h"
 
 #include <iostream>
 
 int main() {
-	GameRenderer mainScreen = GameRenderer();
-	GameLogic logic = GameLogic(15, 15);
+	GameRenderer mainScreen = GameRenderer(50, 15);
+	GameLogic logic = GameLogic(50, 15);
 	logic.placeCell(0, 1);
 	logic.placeCell(1, 2);
 	logic.placeCell(2, 0);
@@ -17,6 +17,6 @@ int main() {
 	while (true) {
 		logic.simulate();
 		mainScreen.renderFrame(logic.getField());
-		Sleep(30);
+		Sleep(100);
 	}
 }

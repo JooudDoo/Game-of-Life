@@ -1,5 +1,9 @@
 ﻿#include "Game.h"
 
+Frame::Frame() : width(0), height(0), data(NULL) {
+
+}
+
 Frame::Frame(const SHORT& iWidth, const SHORT& iHeight, const FrameData& iData) : width(iWidth), height(iHeight), data(iData) {}
 
 Frame::Frame(const Field& gf) : width(gf.width), height(gf.height) {
@@ -19,7 +23,23 @@ Frame::Frame(const Field& gf) : width(gf.width), height(gf.height) {
 
 Frame::Frame(const SHORT& iWidth, const SHORT& iHeight) : width(iWidth), height(iHeight) {
 	data = FrameData();
-	data.resize(height, std::wstring(width, EMPTY_CELL));
+	data.resize(height, STRING(width, EMPTY_CELL));
+}
+
+CHAR_T& Frame::at(SHORT y, SHORT x) {
+	if (y >= height) {
+		y %= height;
+	}
+	if (x >= width) {
+		x %= width;
+	}
+	if (x < 0) {
+		x += width;
+	}
+	if (y < 0) {
+		y += height;
+	}
+	return data[y][x];
 }
 
 Field::Field() : width(FILED_BASE_SIZE), height(FILED_BASE_SIZE) {};
