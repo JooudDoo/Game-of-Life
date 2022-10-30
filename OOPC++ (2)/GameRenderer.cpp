@@ -1,8 +1,8 @@
 ﻿#include "GameRenderer.h"
-#include <TCHAR.H>
 #include <iostream>
+#include <conio.h>
 
-GameRenderer::GameRenderer() : consoleMaxX(80), consoleMaxY(50), canvasHeight(50), canvasWidth(50) {
+GameRenderer::GameRenderer() : consoleMaxX(80), consoleMaxY(50), canvasHeight(HEIGHTDEFAULT), canvasWidth(WIDTHDEFAULT) {
 	InitConsole();
     InitCanvas();
     renderBorder();
@@ -12,6 +12,55 @@ GameRenderer::GameRenderer(const SHORT& iWidth, const SHORT& iHeight) : consoleM
     InitConsole();
     InitCanvas();
     renderBorder();
+}
+
+bool GameRenderer::checkPlayer() {
+    INPUT_RECORD irInBuf[128];
+    DWORD cNumRead;
+
+    bool enabled = true;
+
+    if (!_kbhit())
+        return enabled;
+
+    ReadConsoleInput(
+        cInput,
+        irInBuf,
+        128,
+        &cNumRead);
+
+    for (DWORD i = 0; i < cNumRead; i++)
+    {
+        switch (irInBuf[i].EventType)
+        {
+        case KEY_EVENT:
+            if (irInBuf[i].Event.KeyEvent.bKeyDown) {
+                enabled = keyboardHandler(irInBuf[i].Event.KeyEvent);
+            }
+            break;
+
+        case MOUSE_EVENT:
+            //mouse_handler(irInBuf[i].Event.MouseEvent);
+            break;
+
+        default:
+            break;
+        }
+    }
+
+    return enabled;
+}
+
+bool GameRenderer::keyboardHandler(const KEY_EVENT_RECORD& mr) {
+    int keyPressed = mr.uChar.AsciiChar;
+    switch (keyPressed) {
+    case('q'):
+    case('Q'):
+        return false;
+    default:
+        break;
+    }
+    return true;
 }
 
 void GameRenderer::renderFrame(Frame& fr) {
@@ -51,7 +100,7 @@ void GameRenderer::InitConsole() {
     SetConsoleWindowInfo(cOut, TRUE, &console_position);
     SetConsoleTextAttribute(cOut, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
 
-    DWORD fdwMode = ENABLE_WINDOW_INPUT;
+    DWORD fdwMode = ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT;
     SetConsoleMode(cInput, fdwMode);
     canvasStartPos = { 6, 3 };
 }

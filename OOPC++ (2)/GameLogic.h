@@ -1,5 +1,6 @@
 #pragma once
-#include "Game.h"
+#include "utility.h"
+
 
 typedef struct GameRule_S {
 	std::vector<SHORT> birth;
@@ -10,13 +11,14 @@ static GameRule DEFAULT_RULE = { {3}, {2, 3} };
 
 class GameLogic {
 public:
+	GameLogic();
 	GameLogic(const SHORT&, const SHORT&);
 	GameLogic(const SHORT&, const SHORT&, const GameRule&);
 	~GameLogic() = default;
 
 	void simulate();
 
-	bool placeCell(const SHORT&, const SHORT&);
+	bool placeCell(const SHORT& x, const SHORT& y);
 	bool clearCell(const SHORT& x, const SHORT& y);
 
 	Field& getField();

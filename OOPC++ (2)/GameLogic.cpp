@@ -1,5 +1,10 @@
 #include "GameLogic.h"
 
+GameLogic::GameLogic() : width(WIDTHDEFAULT), height(HEIGHTDEFAULT) {
+	gameField = Field{ width, height };
+	rule = DEFAULT_RULE;
+}
+
 GameLogic::GameLogic(const SHORT& iWidth, const SHORT& iHeight) : width(iWidth), height(iHeight) {
 	gameField = Field{ width, height };
 	rule = DEFAULT_RULE;
