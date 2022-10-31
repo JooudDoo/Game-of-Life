@@ -11,6 +11,8 @@ std::string consoleCodeToString(const ConsoleCodes& c) {
 		return "paused";
 	case(mouseClick):
 		return "mouse mode";
+	case(reset):
+		return "reset field";
 	}
 }
 

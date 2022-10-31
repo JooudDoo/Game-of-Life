@@ -21,6 +21,7 @@ public:
 	bool switchCell(const SHORT& x, const SHORT& y);
 	bool placeCell(const SHORT& x, const SHORT& y);
 	bool clearCell(const SHORT& x, const SHORT& y);
+	void clearField();
 
 	Field& getField();
 

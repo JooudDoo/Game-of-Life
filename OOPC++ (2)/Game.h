@@ -28,9 +28,11 @@ public:
 private:
 
 	void pausedGame();
+	void resetField();
 
 	sys_time_t T_st, T_end;
 	SHORT targetTPS;
+	SHORT pauseTargetTPS;
 	GameLogic logic;
 	GameRenderer renderer;
 	SHORT canvasWidth;

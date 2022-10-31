@@ -3,6 +3,6 @@
 #include <iostream>
 
 int main() {
-	LifeGame game = LifeGame(150, 50);
-	game.runGame("Test universe", 50);
-}q
+	LifeGame game = LifeGame(100, 50);
+	game.runGame("Test universe", 144);
+}

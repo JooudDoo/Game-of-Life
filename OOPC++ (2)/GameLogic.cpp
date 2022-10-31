@@ -74,3 +74,7 @@ bool GameLogic::switchCell(const SHORT& y, const SHORT& x) {
 	}
 	return true;
 }
+
+void GameLogic::clearField() {
+	gameField = Field{ width, height };
+}

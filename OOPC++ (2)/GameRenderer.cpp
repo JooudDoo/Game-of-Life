@@ -55,6 +55,9 @@ PlAction GameRenderer::keyboardHandler(const KEY_EVENT_RECORD& mr) {
     case('p'):
     case('P'):
         return {pause, NULL};
+    case('r'):
+    case('R'):
+        return { reset, NULL };
     default:
         break;
     }
@@ -125,7 +128,7 @@ void GameRenderer::renderTPS(const SHORT& currentTPS) {
         return;
     COORD cursorPointer = {menuPos.X, menuPos.Y + 1};
     SetConsoleCursorPosition(cOut, cursorPointer);
-    COUT << std::string(20, ' ');
+    COUT << std::string(25, ' ');
     SetConsoleCursorPosition(cOut, cursorPointer);
     COUT << "TPS: " << currentTPS << " (target: " << targetTPS << ")";
     prevTPS = currentTPS;
@@ -135,7 +138,7 @@ void GameRenderer::renderState(const ConsoleCodes& state) {
         return;
     COORD cursorPointer = { menuPos.X, menuPos.Y + 2 };
     SetConsoleCursorPosition(cOut, cursorPointer);
-    COUT << std::string(20, ' ');
+    COUT << std::string(25, ' ');
     SetConsoleCursorPosition(cOut, cursorPointer);
     COUT << "State: " << consoleCodeToString(state);
     prevState = state;

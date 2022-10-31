@@ -4,9 +4,9 @@ inline long long time_to_msec(const sys_time_t& t) {
 	return t.time * 1000LL + t.millitm;
 }
 
-LifeGame::LifeGame() : canvasHeight(HEIGHTDEFAULT), canvasWidth(WIDTHDEFAULT), logic(WIDTHDEFAULT, HEIGHTDEFAULT), renderer(WIDTHDEFAULT, HEIGHTDEFAULT), targetTPS(0) {}
+LifeGame::LifeGame() : pauseTargetTPS(60), canvasHeight(HEIGHTDEFAULT), canvasWidth(WIDTHDEFAULT), logic(WIDTHDEFAULT, HEIGHTDEFAULT), renderer(WIDTHDEFAULT, HEIGHTDEFAULT), targetTPS(0) {}
 
-LifeGame::LifeGame(const SHORT& cWidth, const SHORT& cHeight) : canvasHeight(cHeight), canvasWidth(cWidth), logic(cWidth, cHeight), renderer(cWidth, cHeight), targetTPS(0) {}
+LifeGame::LifeGame(const SHORT& cWidth, const SHORT& cHeight) : pauseTargetTPS(60), canvasHeight(cHeight), canvasWidth(cWidth), logic(cWidth, cHeight), renderer(cWidth, cHeight), targetTPS(0) {}
 
 void LifeGame::runGame(const std::string& universeName, const SHORT& targetTPS) {
 	renderer.setTargetTPS(targetTPS);
@@ -20,6 +20,7 @@ void LifeGame::runGame(const std::string& universeName, const SHORT& targetTPS) 
 		renderFrame(true, currentTPS, action.code);
 		action = renderer.checkPlayer(false);
 		if (action.code == pause) pausedGame();
+		else if (action.code == reset) resetField();
 		Sleep(delay);
 		_ftime_s(&T_end);
 		currentTPS = 1000 / (time_to_msec(T_end) - time_to_msec(T_st)) + 1;
@@ -28,7 +29,7 @@ void LifeGame::runGame(const std::string& universeName, const SHORT& targetTPS) 
 
 void LifeGame::pausedGame() {
 	PlAction action = { pause, NULL };
-	DWORD delay = 1000 / targetTPS;
+	DWORD delay = 1000 / pauseTargetTPS;
 	while (true) {
 		renderFrame(false, 0, action.code);
 		action = renderer.checkPlayer(true);
@@ -37,10 +38,15 @@ void LifeGame::pausedGame() {
 		else if (action.code == mouseClick) {
 			logic.switchCell(action.mouseClick.Y, action.mouseClick.X);
 		}
+		else if (action.code == reset) resetField();
 		else if (action.code == none)
 			action.code = pause;
 		Sleep(delay);
 	}
+}
+
+void LifeGame::resetField() {
+	logic.clearField();
 }
 
 void LifeGame::renderFrame(const bool& isSimulate, const SHORT& currentTPS, const ConsoleCodes& state) {

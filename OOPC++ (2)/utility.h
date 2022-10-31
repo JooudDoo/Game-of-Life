@@ -22,6 +22,7 @@ enum ConsoleCodes {
 	quit,
 	pause,
 	mouseClick,
+	reset
 };
 
 std::string consoleCodeToString(const ConsoleCodes&);
