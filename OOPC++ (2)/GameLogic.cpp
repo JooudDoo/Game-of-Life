@@ -67,3 +67,10 @@ bool GameLogic::placeCell(const SHORT& y, const SHORT& x) {
 	gameField.at(y, x) = cell;
 	return true;
 }
+
+bool GameLogic::switchCell(const SHORT& y, const SHORT& x) {
+	if (!placeCell(y, x)) {
+		return clearCell(y, x);
+	}
+	return true;
+}

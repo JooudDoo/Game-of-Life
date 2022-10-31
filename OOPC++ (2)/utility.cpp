@@ -1,5 +1,19 @@
 #include "utility.h"
 
+std::string consoleCodeToString(const ConsoleCodes& c) {
+	switch (c) {
+	default:
+	case(none):
+		return "simulation";
+	case(quit):
+		return "disabled";
+	case(pause):
+		return "paused";
+	case(mouseClick):
+		return "mouse mode";
+	}
+}
+
 Frame::Frame() : width(0), height(0), data(NULL) {}
 
 Frame::Frame(const SHORT& iWidth, const SHORT& iHeight, const FrameData& iData) : width(iWidth), height(iHeight), data(iData) {}

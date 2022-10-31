@@ -21,8 +21,10 @@ enum ConsoleCodes {
 	none,
 	quit,
 	pause,
-	mouseClick
+	mouseClick,
 };
+
+std::string consoleCodeToString(const ConsoleCodes&);
 
 typedef struct PlAction_S{
 

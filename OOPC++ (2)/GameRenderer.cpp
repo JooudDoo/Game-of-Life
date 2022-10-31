@@ -2,16 +2,24 @@
 #include <iostream>
 #include <conio.h>
 
-GameRenderer::GameRenderer() : consoleMaxX(80), consoleMaxY(50), canvasHeight(HEIGHTDEFAULT), canvasWidth(WIDTHDEFAULT) {
+GameRenderer::GameRenderer() : canvasHeight(HEIGHTDEFAULT), canvasWidth(WIDTHDEFAULT) {
 	InitConsole();
     InitCanvas();
     renderBorder();
 }
 
-GameRenderer::GameRenderer(const SHORT& iWidth, const SHORT& iHeight) : consoleMaxX(80), consoleMaxY(50), canvasHeight(iHeight), canvasWidth(iWidth) {
+GameRenderer::GameRenderer(const SHORT& iWidth, const SHORT& iHeight) : canvasHeight(iHeight), canvasWidth(iWidth) {
     InitConsole();
     InitCanvas();
     renderBorder();
+}
+
+void GameRenderer::setUniverseName(const std::string& name) {
+    universeName = name;
+}
+
+void GameRenderer::setTargetTPS(const SHORT& targetTPS) {
+    GameRenderer::targetTPS = targetTPS;
 }
 
 PlAction GameRenderer::checkPlayer(const bool& useMouse) {
@@ -86,7 +94,7 @@ void GameRenderer::renderFrame(Frame& fr) {
                 COUT << fr.at(line, x);
             }
         }
-        SetConsoleCursorPosition(cOut, {fr.width, fr.height});
+        SetConsoleCursorPosition(cOut, {0, 0});
     }
     prevFrame = fr;
 }
@@ -96,19 +104,67 @@ void GameRenderer::renderFrame(Field& fr) {
     renderFrame(frame);
 }
 
+void GameRenderer::renderGUI(const SHORT& currentTPS, const ConsoleCodes& state) {
+
+    renderName();
+    renderTPS(currentTPS);
+    renderState(state);
+    SetConsoleCursorPosition(cOut, { 0, 0 });
+}
+
+void GameRenderer::renderName() {
+    if (isNameRendered)
+        return;
+    COORD cursorPointer = menuPos;
+    SetConsoleCursorPosition(cOut, cursorPointer);
+    COUT << "  \"" << universeName << "\"";
+    isNameRendered = true;
+}
+void GameRenderer::renderTPS(const SHORT& currentTPS) {
+    if (prevTPS == currentTPS)
+        return;
+    COORD cursorPointer = {menuPos.X, menuPos.Y + 1};
+    SetConsoleCursorPosition(cOut, cursorPointer);
+    COUT << std::string(20, ' ');
+    SetConsoleCursorPosition(cOut, cursorPointer);
+    COUT << "TPS: " << currentTPS << " (target: " << targetTPS << ")";
+    prevTPS = currentTPS;
+}
+void GameRenderer::renderState(const ConsoleCodes& state) {
+    if (prevState == state)
+        return;
+    COORD cursorPointer = { menuPos.X, menuPos.Y + 2 };
+    SetConsoleCursorPosition(cOut, cursorPointer);
+    COUT << std::string(20, ' ');
+    SetConsoleCursorPosition(cOut, cursorPointer);
+    COUT << "State: " << consoleCodeToString(state);
+    prevState = state;
+}
+
 void GameRenderer::InitConsole() {
     cOut = GetStdHandle(STD_OUTPUT_HANDLE);
     cInput = GetStdHandle(STD_INPUT_HANDLE);
+
+    if (canvasHeight > 50)
+        std::cerr << "It's not recomended to create game frame with height more than 50";
+
     SetConsoleTitle(TEXT("Life game"));
     SetConsoleOutputCP(CP);
-
-    SMALL_RECT console_position { 0, 0, consoleMaxX, consoleMaxY };
-    SetConsoleWindowInfo(cOut, TRUE, &console_position);
-    SetConsoleTextAttribute(cOut, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
-
     DWORD fdwMode = ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT;
     SetConsoleMode(cInput, fdwMode);
+    isNameRendered = false;
     canvasStartPos = { 6, 3 };
+    menuPos = { canvasWidth,  canvasStartPos.Y };
+    menuPos.X += canvasStartPos.X + 5;
+
+    consoleMaxX = (menuPos.X + 35)*8;
+    consoleMaxY = (canvasHeight + canvasStartPos.Y + 5)*14;
+
+    HWND hWindowConsole = GetConsoleWindow();
+    RECT r;
+    GetWindowRect(hWindowConsole, &r);
+    MoveWindow(hWindowConsole, r.left, r.top, consoleMaxX, consoleMaxY, TRUE);
+    SetConsoleTextAttribute(cOut, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
 }
 
 void GameRenderer::InitCanvas() {
