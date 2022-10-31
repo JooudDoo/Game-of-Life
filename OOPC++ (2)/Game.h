@@ -22,6 +22,7 @@ public:
 
 	bool placeCell(const SHORT& x, const SHORT& y);
 	bool clearCell(const SHORT& x, const SHORT& y);
+	bool setFieldBlank(const std::string&);
 	void runGame(const std::string& universeName, const SHORT& targetTPS);
 	void renderFrame(const bool&, const SHORT&, const ConsoleCodes&);
 

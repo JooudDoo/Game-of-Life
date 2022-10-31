@@ -21,12 +21,14 @@ public:
 	bool switchCell(const SHORT& x, const SHORT& y);
 	bool placeCell(const SHORT& x, const SHORT& y);
 	bool clearCell(const SHORT& x, const SHORT& y);
+	bool setBlankField(const Field&);
 	void clearField();
 
 	Field& getField();
 
 private:
 	Field gameField;
+	Field blankField;
 	GameRule rule;
 	SHORT width;
 	SHORT height;

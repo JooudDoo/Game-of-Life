@@ -2,16 +2,19 @@
 
 GameLogic::GameLogic() : width(WIDTHDEFAULT), height(HEIGHTDEFAULT) {
 	gameField = Field{ width, height };
+	blankField = Field{ width, height };
 	rule = DEFAULT_RULE;
 }
 
 GameLogic::GameLogic(const SHORT& iWidth, const SHORT& iHeight) : width(iWidth), height(iHeight) {
 	gameField = Field{ width, height };
+	blankField = Field{ width, height };
 	rule = DEFAULT_RULE;
 }
 
 GameLogic::GameLogic(const SHORT& iWidth, const SHORT& iHeight, const GameRule& iRule) : rule(iRule), width(iWidth), height(iHeight) {
 	gameField = Field{ width, height };
+	blankField = Field{ width, height };
 }
 
 Field& GameLogic::getField() {
@@ -75,6 +78,13 @@ bool GameLogic::switchCell(const SHORT& y, const SHORT& x) {
 	return true;
 }
 
+bool GameLogic::setBlankField(const Field& newBlank) {
+	if (newBlank.height != blankField.height || newBlank.width != blankField.width)
+		return false;
+	blankField = newBlank;
+	return true;
+}
+
 void GameLogic::clearField() {
-	gameField = Field{ width, height };
+	gameField = blankField;
 }
