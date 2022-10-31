@@ -5,14 +5,23 @@ LifeGame::LifeGame() : canvasHeight(HEIGHTDEFAULT), canvasWidth(WIDTHDEFAULT) {
 	renderer = GameRenderer(canvasWidth, canvasHeight);
 }
 
+LifeGame::LifeGame(const SHORT& cWidth, const SHORT& cHeight) : canvasHeight(cHeight), canvasWidth(cWidth) {
+	logic = GameLogic(canvasWidth, canvasHeight);
+	renderer = GameRenderer(canvasWidth, canvasHeight);
+}
+
+
 void LifeGame::runGame(const SHORT& FPS) {
 	DWORD delay = 1000 / FPS;
-	ConsoleCodes state = None;
+	PlAction action = {none, NULL};
 	bool simulate = true;
-	while (state != quit) {
+	while (action.code != quit) { 
 		renderFrame(simulate);
-		state = renderer.checkPlayer();
-		if (state == pause) { simulate = !simulate; }
+		action = renderer.checkPlayer(!simulate);
+		if (action.code == pause) { simulate = !simulate; }
+		if (action.code == mouseClick) {
+			logic.placeCell(action.mouseClick.Y, action.mouseClick.X);
+		}
 		Sleep(delay);
 	}
 	while (true) {

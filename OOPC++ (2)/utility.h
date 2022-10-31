@@ -18,12 +18,20 @@
 #endif
 
 enum ConsoleCodes {
-	None,
+	none,
 	quit,
-	pause
+	pause,
+	mouseClick
 };
 
-constexpr auto EMPTY_CELL = ' ';//'\xb0';
+typedef struct PlAction_S{
+
+	ConsoleCodes code;
+	COORD mouseClick;
+
+}PlAction;
+
+constexpr auto EMPTY_CELL = '\xb0';//'\xb0';
 constexpr auto OCCUPIED_CELL = '\xdb';
 
 constexpr CHAR_T BORDERCORNER = '\xce';

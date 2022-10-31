@@ -3,7 +3,7 @@
 #include <iostream>
 
 int main() {
-	LifeGame game = LifeGame();
+	LifeGame game = LifeGame(50, 25);
 
 	game.placeCell(0, 1);
 	game.placeCell(1, 2);

@@ -14,56 +14,59 @@ GameRenderer::GameRenderer(const SHORT& iWidth, const SHORT& iHeight) : consoleM
     renderBorder();
 }
 
-ConsoleCodes GameRenderer::checkPlayer() {
+PlAction GameRenderer::checkPlayer(const bool& useMouse) {
+    PlAction state = {none, NULL};
+    if (!_kbhit() && !useMouse) 
+        return state;
     INPUT_RECORD irInBuf[128];
     DWORD cNumRead;
-
-    ConsoleCodes enabled = None;
-
-    if (!_kbhit())
-        return None;
-
-    ReadConsoleInput(
-        cInput,
-        irInBuf,
-        128,
-        &cNumRead);
-
+    ReadConsoleInput(cInput, irInBuf, 128, &cNumRead);
     for (DWORD i = 0; i < cNumRead; i++)
     {
         switch (irInBuf[i].EventType)
         {
         case KEY_EVENT:
-            if (irInBuf[i].Event.KeyEvent.bKeyDown) {
-                enabled = keyboardHandler(irInBuf[i].Event.KeyEvent);
-            }
+            if(irInBuf[i].Event.KeyEvent.bKeyDown)
+                state = keyboardHandler(irInBuf[i].Event.KeyEvent);
             break;
 
         case MOUSE_EVENT:
-            //mouse_handler(irInBuf[i].Event.MouseEvent);
-            break;
-
-        default:
+            state = mouseHandler(irInBuf[i].Event.MouseEvent, useMouse);
             break;
         }
     }
-
-    return enabled;
+    return state;
 }
 
-ConsoleCodes GameRenderer::keyboardHandler(const KEY_EVENT_RECORD& mr) {
+PlAction GameRenderer::keyboardHandler(const KEY_EVENT_RECORD& mr) {
     int keyPressed = mr.uChar.AsciiChar;
     switch (keyPressed) {
     case('q'):
     case('Q'):
-        return quit;
+        return {quit, NULL};
     case('p'):
     case('P'):
-        return pause;
+        return {pause, NULL};
     default:
         break;
     }
-    return None;
+    return {none, NULL};
+}
+
+PlAction GameRenderer::mouseHandler(const MOUSE_EVENT_RECORD& mr, const bool& useMouse) {
+    if (!useMouse)
+        return {none, NULL};
+    switch (mr.dwEventFlags) {
+    case 0:
+        if (mr.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
+            SHORT x = mr.dwMousePosition.X - canvasStartPos.X;
+            SHORT y = mr.dwMousePosition.Y - canvasStartPos.Y;
+            return { mouseClick, {x,y} };
+        }
+    default:
+        break;
+    }
+    return { none, NULL };
 }
 
 void GameRenderer::renderFrame(Frame& fr) {
