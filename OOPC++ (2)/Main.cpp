@@ -4,5 +4,5 @@
 
 int main() {
 	LifeGame game = LifeGame(150, 50);
-	game.runGame("Test universe", 10);
-}
+	game.runGame("Test universe", 50);
+}q

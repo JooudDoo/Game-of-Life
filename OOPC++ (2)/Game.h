@@ -9,8 +9,9 @@ typedef _timeb sys_time_t;
 //TODO гибкое количество клеток с разными правилами и их конвертация в соответствующие иконки
 //TODO при рендере изменять только то что изменяется, а не всё поле ✓
 //TODO UTF-8 support ✓ (Частично)
-//TODO переделать основный цикл игры
-//TODO rework state position for mouse handler
+//TODO TPS meter ✓
+//TODO переделать основный цикл игры ✓ (не так как задумывалось)
+//TODO rework state position for mouse handler ✓ (не так как задумывалось)
 //TODO make border for mouse click
 
 
