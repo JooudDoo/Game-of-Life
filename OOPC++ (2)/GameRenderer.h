@@ -28,6 +28,7 @@ private:
 	void renderName();
 	void renderTPS(const SHORT& currentTPS);
 	void renderState(const ConsoleCodes&);
+	void renderInstruction();
 
 	COORD menuPos;
 
@@ -42,6 +43,7 @@ private:
 	COORD canvasStartPos;
 
 	BOOL isNameRendered;
+	BOOL isInstRendered;
 	std::string universeName;
 	SHORT targetTPS;
 	ConsoleCodes prevState;

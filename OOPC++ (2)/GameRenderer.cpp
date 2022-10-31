@@ -110,6 +110,7 @@ void GameRenderer::renderFrame(Field& fr) {
 void GameRenderer::renderGUI(const SHORT& currentTPS, const ConsoleCodes& state) {
 
     renderName();
+    renderInstruction();
     renderTPS(currentTPS);
     renderState(state);
     SetConsoleCursorPosition(cOut, { 0, 0 });
@@ -143,6 +144,29 @@ void GameRenderer::renderState(const ConsoleCodes& state) {
     COUT << "State: " << consoleCodeToString(state);
     prevState = state;
 }
+void GameRenderer::renderInstruction() {
+    if (isInstRendered)
+        return;
+    WORD text_atribute = COMMON_LVB_UNDERSCORE | COMMON_LVB_LEADING_BYTE | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
+    DWORD l;
+    COORD cursorPointer = { menuPos.X, menuPos.Y + 5 };
+    cursorPointer.X += 3;
+    SetConsoleCursorPosition(cOut, cursorPointer);
+    COUT << "Reset";
+    WriteConsoleOutputAttribute(cOut, &text_atribute, 1, cursorPointer, &l);
+    cursorPointer.Y += 1;
+    SetConsoleCursorPosition(cOut, cursorPointer);
+    COUT << "Pause/unPause";
+    WriteConsoleOutputAttribute(cOut, &text_atribute, 1, cursorPointer, &l);
+    cursorPointer.X += 8;
+    WriteConsoleOutputAttribute(cOut, &text_atribute, 1, cursorPointer, &l);
+    cursorPointer.Y += 1;
+    cursorPointer.X -= 8;
+    SetConsoleCursorPosition(cOut, cursorPointer);
+    COUT << "Quit";
+    WriteConsoleOutputAttribute(cOut, &text_atribute, 1, cursorPointer, &l);
+    isInstRendered = true;
+}
 
 void GameRenderer::InitConsole() {
     cOut = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -156,6 +180,7 @@ void GameRenderer::InitConsole() {
     DWORD fdwMode = ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT;
     SetConsoleMode(cInput, fdwMode);
     isNameRendered = false;
+    isInstRendered = false;
     canvasStartPos = { 6, 3 };
     menuPos = { canvasWidth,  canvasStartPos.Y };
     menuPos.X += canvasStartPos.X + 5;
