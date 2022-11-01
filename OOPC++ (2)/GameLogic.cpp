@@ -44,12 +44,10 @@ void GameLogic::simulate() {
 }
 
 SHORT GameLogic::checkAliveSquare(const SHORT& iY, const SHORT& iX) {
-	SHORT cntCellsAround = 0;
+	SHORT cntCellsAround = 0 - gameField.at(iY + 1, iX + 1);
 	for (SHORT line = iY; line < iY + 3; line++) {
 		for (SHORT x = iX; x < iX + 3; x++) {
-			if (gameField.at(line, x) != empty && (line != iY+1 || x != iX+1)) {
-				cntCellsAround += 1;
-			}
+			cntCellsAround += gameField.at(line, x);
 		}
 	}
 	return cntCellsAround;
