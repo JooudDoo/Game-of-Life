@@ -1,0 +1,8 @@
+#Life 1.06
+#N Universe From File
+#R B2/S23
+0 -1
+1 0
+-1 1
+0 1
+1 1

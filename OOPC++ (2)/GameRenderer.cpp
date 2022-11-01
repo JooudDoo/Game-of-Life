@@ -16,6 +16,7 @@ GameRenderer::GameRenderer(const SHORT& iWidth, const SHORT& iHeight) : canvasHe
 
 void GameRenderer::setUniverseName(const std::string& name) {
     universeName = name;
+    isNameRendered = false;
 }
 
 void GameRenderer::setTargetTPS(const SHORT& targetTPS) {
@@ -171,6 +172,7 @@ void GameRenderer::renderInstruction() {
 void GameRenderer::InitConsole() {
     cOut = GetStdHandle(STD_OUTPUT_HANDLE);
     cInput = GetStdHandle(STD_INPUT_HANDLE);
+    isInstRendered = false;
 
     if (canvasHeight > 50)
         std::cerr << "It's not recomended to create game frame with height more than 50";
@@ -179,8 +181,6 @@ void GameRenderer::InitConsole() {
     SetConsoleOutputCP(CP);
     DWORD fdwMode = ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT;
     SetConsoleMode(cInput, fdwMode);
-    isNameRendered = false;
-    isInstRendered = false;
     canvasStartPos = { 6, 3 };
     menuPos = { canvasWidth,  canvasStartPos.Y };
     menuPos.X += canvasStartPos.X + 5;

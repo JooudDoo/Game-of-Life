@@ -1,12 +1,6 @@
 #pragma once
 #include "utility.h"
 
-
-typedef struct GameRule_S {
-	std::vector<SHORT> birth;
-	std::vector<SHORT> stay;
-}GameRule;
-
 static GameRule DEFAULT_RULE = { {3}, {2, 3} };
 
 class GameLogic {

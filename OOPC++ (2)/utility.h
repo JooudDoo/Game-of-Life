@@ -84,3 +84,16 @@ public:
 	SHORT height;
 	FrameData data;
 };
+
+typedef struct GameRule_S {
+	std::vector<SHORT> birth;
+	std::vector<SHORT> stay;
+}GameRule;
+
+typedef struct GameData_S {
+
+	std::string name;
+	Field gameField;
+	GameRule rule;
+
+}GameData;
