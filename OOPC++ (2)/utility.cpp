@@ -140,7 +140,8 @@ std::pair<SHORT, SHORT> sizeFString(const std::string& str) {
 	std::smatch birth;
 	std::smatch stay;
 	std::regex_search(str, birth, birthPattern);
-	std::regex_search(str, stay, stayPattern);
+	std::string a = birth.suffix().str();
+	std::regex_search(a, stay, stayPattern);
 
 	auto seq = birth.begin() + 1;
 	if (seq == birth.end())

@@ -38,7 +38,7 @@ void LifeGame::runGame(const SHORT& targetTPS) {
 	runGame(UniverseName, targetTPS);
 }
 
-void LifeGame::runGame(const std::string& universeName, const SHORT& targetTPS) {
+void LifeGame::runGame(const std::string& universeName, const SHORT& targetTPS) { //REFACTOR THIS 
 	renderer.setTargetTPS(targetTPS);
 	renderer.setUniverseName(universeName);
 	LifeGame::UniverseName = universeName;
@@ -110,7 +110,7 @@ void LifeGame::pausedGame() {
 			else if (action.code == none)
 				action.code = pause;
 		}
-		Sleep(delay);
+		//Sleep(delay);
 	}
 	isPaused = false;
 }

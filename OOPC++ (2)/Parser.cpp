@@ -7,7 +7,7 @@ GameRule DEFAULTRULE = { {3}, {2, 3} };
 
 
 FileParser::FileParser() {
-	if (!std::filesystem::exists(fs::current_path().string() + "\\logs")) {
+	if (!fs::exists(fs::current_path().string() + "\\logs")) {
 		if (!std::filesystem::create_directories(fs::current_path().string() + "\\logs")) {
 			logFile.open("\\log.txt");
 			return;
@@ -55,7 +55,7 @@ GameData FileParser::parseUniverseFF(const std::string& filePath) {
 	else {
 		logFile << "[SIZE] The field size will be: " << data << std::endl;
 		std::pair<SHORT, SHORT> newSize = sizeFString(data); //TODO smt wrong with line
-		worldData.gameField = Field{ newSize.second, newSize.first };
+		worldData.gameField = Field{ newSize.first, newSize.second };
 		skipNextRead = false;
 	}
 

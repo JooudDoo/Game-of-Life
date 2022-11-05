@@ -37,7 +37,7 @@ std::vector<PlAction> GameRenderer::checkPlayer(const bool& useMouse) {
         switch (irInBuf[i].EventType)
         {
         case KEY_EVENT:
-            if(irInBuf[i].Event.KeyEvent.bKeyDown)
+            if(irInBuf[i].Event.KeyEvent.bKeyDown && irInBuf[i].Event.KeyEvent.wVirtualKeyCode!=17)
                 state.push_back(keyboardHandler(irInBuf[i].Event.KeyEvent));
             break;
         case MOUSE_EVENT:
@@ -204,8 +204,24 @@ void GameRenderer::InitConsole() {
     menuPos = { canvasWidth,  canvasStartPos.Y };
     menuPos.X += canvasStartPos.X + 5;
 
-    consoleMaxX = (menuPos.X + 35)*8;
-    consoleMaxY = (canvasHeight + canvasStartPos.Y + 5)*14;
+    CONSOLE_FONT_INFO fontInfo;
+    CONSOLE_FONT_INFOEX fontInfoE;
+    GetCurrentConsoleFont(cOut, TRUE, &fontInfo);
+    COORD fontSize = GetConsoleFontSize(cOut, fontInfo.nFont);
+
+    fontInfoE.cbSize = sizeof(fontInfoE);
+    GetCurrentConsoleFontEx(cOut, FALSE, &fontInfoE);
+    fontInfoE.dwFontSize.X = 12;
+    fontInfoE.dwFontSize.Y = 16;
+    fontInfoE.FontFamily = 48;
+    fontInfoE.FontWeight = 400;
+    fontInfoE.nFont = 0;
+    wcscpy_s(fontInfoE.FaceName, L"Terminal");
+    SetCurrentConsoleFontEx(cOut, FALSE, &fontInfoE);
+
+
+    consoleMaxX = (menuPos.X + 35)* fontInfoE.dwFontSize.X;
+    consoleMaxY = (canvasHeight + canvasStartPos.Y + 5) * fontInfoE.dwFontSize.Y;
 
     HWND hWindowConsole = GetConsoleWindow();
     RECT r;

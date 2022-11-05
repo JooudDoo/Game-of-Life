@@ -37,7 +37,7 @@ typedef struct PlAction_S{
 
 }PlAction;
 
-constexpr auto EMPTY_CELL = '\xb0';//'\xb0';
+constexpr auto EMPTY_CELL = ' ';//'\xb0';
 constexpr auto OCCUPIED_CELL = '\xdb';
 
 constexpr CHAR_T BORDERCORNER = '\xce';
