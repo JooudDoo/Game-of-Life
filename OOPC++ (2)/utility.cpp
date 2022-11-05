@@ -1,5 +1,9 @@
 #include "utility.h"
 
+#include <regex>
+
+static GameRule DEFAULTRULE = { {3}, {2, 3} };
+
 std::string consoleCodeToString(const ConsoleCodes& c) {
 	switch (c) {
 	default:
@@ -56,7 +60,10 @@ CHAR_T& Frame::at(SHORT y, SHORT x) {
 	return data[y][x];
 }
 
-Field::Field() : width(FILED_BASE_SIZE), height(FILED_BASE_SIZE) {};
+Field::Field() : width(FILED_BASE_SIZE), height(FILED_BASE_SIZE) {
+	data = FieldData();
+	data.resize(height, std::vector<Cell_T>(width));
+};
 
 Field::Field(const SHORT& iWidth, const SHORT& iHeight) : width(iWidth), height(iHeight) {
 	data = FieldData();
@@ -94,4 +101,58 @@ Cell_T& Field::at(SHORT y, SHORT x) {
 		y += height;
 	}
 	return data[y][x];
+}
+
+// B2/S23
+GameRule ruleFString(const std::string& rule) {
+	GameRule rl;
+	std::regex birthPattern("B([0-9]*)/");
+	std::regex stayPattern("S([0-9]*)");
+
+	std::smatch birth;
+	std::smatch stay;
+	std::regex_search(rule, birth, birthPattern);
+	std::regex_search(rule, stay, stayPattern);
+
+	auto seq = birth.begin() + 1;
+	if (seq == birth.end())
+		return DEFAULTRULE;
+	std::string parse = *seq;
+	for (auto sym : parse) {
+		rl.birth.push_back(sym - '0');
+	}
+	seq = stay.begin() + 1;
+	if (seq == stay.end())
+		return DEFAULTRULE;
+	parse = *seq;
+	for (auto sym : parse) {
+		rl.stay.push_back(sym - '0');
+	}
+
+	return rl;
+}
+
+std::pair<SHORT, SHORT> sizeFString(const std::string& str) {
+	int m1, m2;
+	std::regex birthPattern("([0-9]*).?");
+	std::regex stayPattern("([0-9]*)");
+
+	std::smatch birth;
+	std::smatch stay;
+	std::regex_search(str, birth, birthPattern);
+	std::regex_search(str, stay, stayPattern);
+
+	auto seq = birth.begin() + 1;
+	if (seq == birth.end())
+		return {15, 15};
+	std::string parse = *seq;
+	sscanf_s(parse.c_str(), "%d", &m1);
+	seq = stay.begin() + 1;
+	if (seq == stay.end())
+		return  { 15, 15 };
+	parse = *seq;
+	sscanf_s(parse.c_str(), "%d", &m2);
+	
+
+	return {m1, m2};
 }

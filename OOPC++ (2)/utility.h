@@ -22,7 +22,8 @@ enum ConsoleCodes {
 	quit,
 	pause,
 	mouseClick,
-	reset
+	reset,
+	saveFieldToReset,
 };
 
 std::string consoleCodeToString(const ConsoleCodes&);
@@ -97,3 +98,6 @@ typedef struct GameData_S {
 	GameRule rule;
 
 }GameData;
+
+GameRule ruleFString(const std::string&);
+std::pair<SHORT, SHORT> sizeFString(const std::string&);

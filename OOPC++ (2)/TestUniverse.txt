@@ -1,8 +1,4 @@
 #Life 1.06
 #N Universe From File
-#R B2/S23
-0 -1
-1 0
--1 1
-0 1
-1 1
+#S 50x25
+#R B3/S23

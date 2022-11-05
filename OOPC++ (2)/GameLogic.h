@@ -1,8 +1,6 @@
 #pragma once
 #include "utility.h"
 
-static GameRule DEFAULT_RULE = { {3}, {2, 3} };
-
 class GameLogic {
 public:
 	GameLogic();
@@ -17,6 +15,8 @@ public:
 	bool clearCell(const SHORT& x, const SHORT& y);
 	bool setBlankField(const Field&);
 	void clearField();
+
+	void setRule(const GameRule&);
 
 	Field& getField();
 

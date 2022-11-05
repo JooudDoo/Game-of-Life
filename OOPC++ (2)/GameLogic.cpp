@@ -1,20 +1,26 @@
 #include "GameLogic.h"
 
+static GameRule DEFAULTRULE = { {3}, {2, 3} };
+
 GameLogic::GameLogic() : width(WIDTHDEFAULT), height(HEIGHTDEFAULT) {
 	gameField = Field{ width, height };
 	blankField = Field{ width, height };
-	rule = DEFAULT_RULE;
+	rule = DEFAULTRULE;
 }
 
 GameLogic::GameLogic(const SHORT& iWidth, const SHORT& iHeight) : width(iWidth), height(iHeight) {
 	gameField = Field{ width, height };
 	blankField = Field{ width, height };
-	rule = DEFAULT_RULE;
+	rule = DEFAULTRULE;
 }
 
 GameLogic::GameLogic(const SHORT& iWidth, const SHORT& iHeight, const GameRule& iRule) : rule(iRule), width(iWidth), height(iHeight) {
 	gameField = Field{ width, height };
 	blankField = Field{ width, height };
+}
+
+void GameLogic::setRule(const GameRule& r) {
+	rule = r;
 }
 
 Field& GameLogic::getField() {
@@ -77,9 +83,8 @@ bool GameLogic::switchCell(const SHORT& y, const SHORT& x) {
 }
 
 bool GameLogic::setBlankField(const Field& newBlank) {
-	if (newBlank.height != blankField.height || newBlank.width != blankField.width)
-		return false;
 	blankField = newBlank;
+	gameField = newBlank;
 	return true;
 }
 

@@ -59,6 +59,9 @@ PlAction GameRenderer::keyboardHandler(const KEY_EVENT_RECORD& mr) {
     case('r'):
     case('R'):
         return { reset, NULL };
+    case('s'):
+    case('S'):
+        return { saveFieldToReset, NULL };
     default:
         break;
     }
@@ -75,6 +78,7 @@ PlAction GameRenderer::mouseHandler(const MOUSE_EVENT_RECORD& mr, const bool& us
             SHORT y = mr.dwMousePosition.Y - canvasStartPos.Y;
             return { mouseClick, {x,y} };
         }
+        break;
     default:
         break;
     }
@@ -155,14 +159,21 @@ void GameRenderer::renderInstruction() {
     SetConsoleCursorPosition(cOut, cursorPointer);
     COUT << "Reset";
     WriteConsoleOutputAttribute(cOut, &text_atribute, 1, cursorPointer, &l);
+
     cursorPointer.Y += 1;
     SetConsoleCursorPosition(cOut, cursorPointer);
     COUT << "Pause/unPause";
     WriteConsoleOutputAttribute(cOut, &text_atribute, 1, cursorPointer, &l);
     cursorPointer.X += 8;
     WriteConsoleOutputAttribute(cOut, &text_atribute, 1, cursorPointer, &l);
-    cursorPointer.Y += 1;
     cursorPointer.X -= 8;
+
+    cursorPointer.Y += 1;
+    SetConsoleCursorPosition(cOut, cursorPointer);
+    COUT << "SaveToReset";
+    WriteConsoleOutputAttribute(cOut, &text_atribute, 1, cursorPointer, &l);
+
+    cursorPointer.Y += 1;
     SetConsoleCursorPosition(cOut, cursorPointer);
     COUT << "Quit";
     WriteConsoleOutputAttribute(cOut, &text_atribute, 1, cursorPointer, &l);

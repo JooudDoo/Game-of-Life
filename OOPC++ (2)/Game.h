@@ -2,6 +2,7 @@
 #include "utility.h"
 #include "GameRenderer.h"
 #include "GameLogic.h"
+#include "Parser.h"
 
 #include <sys/timeb.h>
 typedef _timeb sys_time_t;
@@ -14,19 +15,26 @@ typedef _timeb sys_time_t;
 //TODO rework state position for mouse handler ✓ (не так как задумывалось)
 //TODO make border for mouse click
 
-
 class LifeGame {
+	friend LifeGame createGameFFile(const std::string&);
 public:
 	LifeGame();
 	LifeGame(const SHORT& cWidth, const SHORT& cHeight);
 
 	bool placeCell(const SHORT& x, const SHORT& y);
 	bool clearCell(const SHORT& x, const SHORT& y);
-	bool setFieldBlank(const std::string&);
+	bool setFieldBlank(const Field&);
+	
+	void setUniverseName(const std::string&);
+	void setGameRule(const GameRule&);
+
+	void runGame(const SHORT& targetTPS);
 	void runGame(const std::string& universeName, const SHORT& targetTPS);
 	void renderFrame(const bool&, const SHORT&, const ConsoleCodes&);
 
 private:
+
+	std::string UniverseName;
 
 	void pausedGame();
 	void resetField();
@@ -38,5 +46,8 @@ private:
 	GameRenderer renderer;
 	SHORT canvasWidth;
 	SHORT canvasHeight;
+
+	bool isPaused;
 };
 
+LifeGame createGameFFile(const std::string&);
