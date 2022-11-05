@@ -4,5 +4,5 @@
 
 int main() {
 	LifeGame a = createGameFFile("TestUniverse.txt");
-	a.runGame(60);
+	a.runGame(244);
 }

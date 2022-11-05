@@ -10,6 +10,7 @@ public:
 
 	void simulate();
 
+	bool isEmptyCell(const SHORT& x, const SHORT& y);
 	bool switchCell(const SHORT& x, const SHORT& y);
 	bool placeCell(const SHORT& x, const SHORT& y);
 	bool clearCell(const SHORT& x, const SHORT& y);

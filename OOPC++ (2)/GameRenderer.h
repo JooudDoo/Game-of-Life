@@ -8,7 +8,7 @@ public:
 	GameRenderer(const SHORT&, const SHORT&);
 	~GameRenderer() = default;
 
-	PlAction checkPlayer(const bool& useMouse);
+	std::vector<PlAction> checkPlayer(const bool& useMouse);
 
 	void renderFrame(Frame&);
 	void renderFrame(Field&);

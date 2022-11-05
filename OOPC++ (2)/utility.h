@@ -24,6 +24,7 @@ enum ConsoleCodes {
 	mouseClick,
 	reset,
 	saveFieldToReset,
+	mouseCtrlMove,
 };
 
 std::string consoleCodeToString(const ConsoleCodes&);
@@ -32,6 +33,7 @@ typedef struct PlAction_S{
 
 	ConsoleCodes code;
 	COORD mouseClick;
+	BOOL ctrlState;
 
 }PlAction;
 

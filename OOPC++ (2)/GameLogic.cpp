@@ -59,6 +59,13 @@ SHORT GameLogic::checkAliveSquare(const SHORT& iY, const SHORT& iX) {
 	return cntCellsAround;
 }
 
+bool GameLogic::isEmptyCell(const SHORT& y, const SHORT& x) {
+	if (gameField.at(y, x) == empty) {
+		return true;
+	}
+	return false;
+}
+
 bool GameLogic::clearCell(const SHORT& y, const SHORT& x) {
 	if (gameField.at(y, x) == empty) {
 		return false;

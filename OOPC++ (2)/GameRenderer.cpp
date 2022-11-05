@@ -2,6 +2,8 @@
 #include <iostream>
 #include <conio.h>
 
+#define CTRLSTATE(x) (bool(x.dwControlKeyState & LEFT_CTRL_PRESSED))
+
 GameRenderer::GameRenderer() : canvasHeight(HEIGHTDEFAULT), canvasWidth(WIDTHDEFAULT) {
 	InitConsole();
     InitCanvas();
@@ -23,8 +25,8 @@ void GameRenderer::setTargetTPS(const SHORT& targetTPS) {
     GameRenderer::targetTPS = targetTPS;
 }
 
-PlAction GameRenderer::checkPlayer(const bool& useMouse) {
-    PlAction state = {none, NULL};
+std::vector<PlAction> GameRenderer::checkPlayer(const bool& useMouse) {
+    std::vector<PlAction> state = { };
     if (!_kbhit() && !useMouse) 
         return state;
     INPUT_RECORD irInBuf[128];
@@ -36,11 +38,10 @@ PlAction GameRenderer::checkPlayer(const bool& useMouse) {
         {
         case KEY_EVENT:
             if(irInBuf[i].Event.KeyEvent.bKeyDown)
-                state = keyboardHandler(irInBuf[i].Event.KeyEvent);
+                state.push_back(keyboardHandler(irInBuf[i].Event.KeyEvent));
             break;
-
         case MOUSE_EVENT:
-            state = mouseHandler(irInBuf[i].Event.MouseEvent, useMouse);
+            state.push_back(mouseHandler(irInBuf[i].Event.MouseEvent, useMouse));
             break;
         }
     }
@@ -52,20 +53,20 @@ PlAction GameRenderer::keyboardHandler(const KEY_EVENT_RECORD& mr) {
     switch (keyPressed) {
     case('q'):
     case('Q'):
-        return {quit, NULL};
+        return {quit, NULL, CTRLSTATE(mr)};
     case('p'):
     case('P'):
-        return {pause, NULL};
+        return {pause, NULL, CTRLSTATE(mr) };
     case('r'):
     case('R'):
-        return { reset, NULL };
+        return { reset, NULL, CTRLSTATE(mr) };
     case('s'):
     case('S'):
-        return { saveFieldToReset, NULL };
+        return { saveFieldToReset, NULL, CTRLSTATE(mr) };
     default:
         break;
     }
-    return {none, NULL};
+    return {none, NULL, CTRLSTATE(mr) };
 }
 
 PlAction GameRenderer::mouseHandler(const MOUSE_EVENT_RECORD& mr, const bool& useMouse) {
@@ -76,13 +77,20 @@ PlAction GameRenderer::mouseHandler(const MOUSE_EVENT_RECORD& mr, const bool& us
         if (mr.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) {
             SHORT x = mr.dwMousePosition.X - canvasStartPos.X;
             SHORT y = mr.dwMousePosition.Y - canvasStartPos.Y;
-            return { mouseClick, {x,y} };
+            return { mouseClick, {x,y}, CTRLSTATE(mr) };
+        }
+        break;
+    case MOUSE_MOVED:
+        if (mr.dwControlKeyState & LEFT_CTRL_PRESSED) {
+            SHORT x = mr.dwMousePosition.X - canvasStartPos.X;
+            SHORT y = mr.dwMousePosition.Y - canvasStartPos.Y;
+            return { mouseCtrlMove, {x,y}, CTRLSTATE(mr) };
         }
         break;
     default:
         break;
     }
-    return { none, NULL };
+    return { none, NULL, CTRLSTATE(mr) };
 }
 
 void GameRenderer::renderFrame(Frame& fr) {

@@ -1,5 +1,8 @@
 ﻿#include "Game.h"
 
+#define NONEG(x) (x<0?0:x)
+#define NORMALIZE(x,y) (x%y)
+
 LifeGame createGameFFile(const std::string& filePath) {
 	FileParser parser;
 	GameData preferences = parser.parseUniverseFF(filePath);
@@ -42,19 +45,25 @@ void LifeGame::runGame(const std::string& universeName, const SHORT& targetTPS) 
 	LifeGame::targetTPS = targetTPS;
 	SHORT currentTPS = -1;
 	DWORD delay = 1000 / targetTPS;
-	PlAction action = {none, NULL};
+	std::vector<PlAction> actions;
 	SHORT frameCounter = 0;
+	bool quit = false;
+	sys_time_t Q_end, Q_st;
 	if (isPaused) pausedGame();
-	while (action.code != quit) {
-		renderFrame(true, currentTPS, action.code);
-		action = renderer.checkPlayer(false);
-		if (action.code == pause) pausedGame();
-		else if (action.code == reset) resetField();
-		Sleep(delay);
+	while (!quit) {
+		_ftime_s(&Q_st);
+		renderFrame(true, currentTPS, none);
+		actions = renderer.checkPlayer(false);
+		for (auto action : actions) {
+			if (action.code == pause) { pausedGame(); break; }
+			else if (action.code == reset) resetField();
+		}
+		_ftime_s(&Q_end);
+		Sleep(delay - NORMALIZE(NONEG(time_to_msec(Q_end) - time_to_msec(Q_st)), delay));
 		frameCounter += 1;
 		if (frameCounter == 15) {
 			_ftime_s(&T_end);
-			currentTPS = 1000 / ((time_to_msec(T_end) - time_to_msec(T_st))/ frameCounter);
+			currentTPS = 1000 / ((time_to_msec(T_end) - time_to_msec(T_st)) / frameCounter);
 			_ftime_s(&T_st);
 			frameCounter = 0;
 		}
@@ -63,20 +72,44 @@ void LifeGame::runGame(const std::string& universeName, const SHORT& targetTPS) 
 
 void LifeGame::pausedGame() {
 	isPaused = true;
-	PlAction action = { pause, NULL };
+	std::vector<PlAction> actions;
 	DWORD delay = 1000 / pauseTargetTPS;
-	while (true) {
-		renderFrame(false, 0, action.code);
-		action = renderer.checkPlayer(true);
-		if (action.code == pause)
-			break;
-		else if (action.code == mouseClick) {
-			logic.switchCell(action.mouseClick.Y, action.mouseClick.X);
+	bool CTRLSTATE = false;
+	bool CTRLPLACE = true;
+	bool quit = false;
+	renderFrame(false, 0, pause);
+	while (!quit) {
+		actions = renderer.checkPlayer(true);
+		for (auto action : actions) {
+			renderFrame(false, 0, pause);
+			if (CTRLSTATE == true && action.ctrlState == false)
+				CTRLSTATE = false;
+			if (action.code == pause) {
+				quit = true;
+				break;
+			}
+			else if (action.code == mouseCtrlMove) {
+				if (CTRLSTATE == false) {
+					CTRLSTATE = true;
+					if (logic.isEmptyCell(action.mouseClick.Y, action.mouseClick.X))
+						CTRLPLACE = true;
+					else
+						CTRLPLACE = false;
+				}
+				if (CTRLPLACE)
+					logic.placeCell(action.mouseClick.Y, action.mouseClick.X);
+				else
+					logic.clearCell(action.mouseClick.Y, action.mouseClick.X);
+
+			}
+			else if (action.code == mouseClick) {
+				logic.switchCell(action.mouseClick.Y, action.mouseClick.X);
+			}
+			else if (action.code == reset) resetField();
+			else if (action.code == saveFieldToReset) setFieldBlank(logic.getField());
+			else if (action.code == none)
+				action.code = pause;
 		}
-		else if (action.code == reset) resetField();
-		else if (action.code == saveFieldToReset) setFieldBlank(logic.getField());
-		else if (action.code == none)
-			action.code = pause;
 		Sleep(delay);
 	}
 	isPaused = false;
