@@ -1,3 +1,4 @@
 #Life 1.06
 #N Test Universe
-#S 50x25
+#S 25x25
+#R B012345678/S0

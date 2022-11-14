@@ -1,21 +1,37 @@
 ﻿#include "Game.h"
 
-#define NONEG(x) (x<0?0:x)
+#define TimeIt(st,code,  ed) _ftime_s(&st); \
+							code; \
+							_ftime_s(&ed);
+
+#define NONEG(x) (x>=0 && x<= 1000?x:0)
 #define NORMALIZE(x,y) (x%y)
+
+inline long long time_to_msec(const sys_time_t& t) {
+	return t.time * 1000LL + t.millitm;
+}
 
 LifeGame createGameFFile(const std::string& filePath) {
 	FileParser parser;
 	GameData preferences = parser.parseUniverseFF(filePath);
 	LifeGame game(preferences.gameField.width, preferences.gameField.height);
 	game.setUniverseName(preferences.name);
+	game.setTargetTPS(144);
 	game.setFieldBlank(preferences.gameField);
 	game.setGameRule(preferences.rule);
-	game.isPaused = true;
+	game.gameStatus = gamePause;
 	return game;
 }
 
 void LifeGame::setUniverseName(const std::string& name) {
-	UniverseName = name;
+	universeName = name;
+	con.gRen.setUniverseName(universeName);
+}
+
+void LifeGame::setTargetTPS(const SHORT& tps) {
+	targetTPS = tps;
+	TargetDelay = 1000 / (tps+1*!tps);
+	con.gRen.setTargetTPS(tps);
 }
 
 void LifeGame::setGameRule(const GameRule& r) {
@@ -26,62 +42,48 @@ bool LifeGame::setFieldBlank(const Field& fl) {
 	return logic.setBlankField(fl);
 }
 
-inline long long time_to_msec(const sys_time_t& t) {
-	return t.time * 1000LL + t.millitm;
-}
+LifeGame::LifeGame() : gameStatus(gameNone), canvasHeight(HEIGHTDEFAULT), canvasWidth(WIDTHDEFAULT), logic(WIDTHDEFAULT, HEIGHTDEFAULT), targetTPS(0) {}
 
-LifeGame::LifeGame() : pauseTargetTPS(60), canvasHeight(HEIGHTDEFAULT), canvasWidth(WIDTHDEFAULT), logic(WIDTHDEFAULT, HEIGHTDEFAULT), renderer(WIDTHDEFAULT, HEIGHTDEFAULT), targetTPS(0) {}
+LifeGame::LifeGame(const SHORT& cWidth, const SHORT& cHeight) : con(cWidth, cHeight), gameStatus(gameNone), canvasHeight(cHeight), canvasWidth(cWidth), logic(cWidth, cHeight), targetTPS(0) {}
 
-LifeGame::LifeGame(const SHORT& cWidth, const SHORT& cHeight) : pauseTargetTPS(60), canvasHeight(cHeight), canvasWidth(cWidth), logic(cWidth, cHeight), renderer(cWidth, cHeight), targetTPS(0) {}
+void LifeGame::runGame() { //REFACTOR THIS 
+	setTargetTPS(targetTPS);
+	setUniverseName(universeName);
 
-void LifeGame::runGame(const SHORT& targetTPS) {
-	runGame(UniverseName, targetTPS);
-}
-
-void LifeGame::runGame(const std::string& universeName, const SHORT& targetTPS) { //REFACTOR THIS 
-	renderer.setTargetTPS(targetTPS);
-	renderer.setUniverseName(universeName);
-	LifeGame::UniverseName = universeName;
-	LifeGame::targetTPS = targetTPS;
-	SHORT currentTPS = -1;
-	DWORD delay = 1000 / targetTPS;
 	std::vector<PlAction> actions;
-	SHORT frameCounter = 0;
+	sys_time_t T_st, T_end;
 	bool quit = false;
-	sys_time_t Q_end, Q_st;
-	if (isPaused) pausedGame();
+
+	if (gameStatus == gamePause) pausedGame();
 	while (!quit) {
-		_ftime_s(&Q_st);
-		renderFrame(true, currentTPS, none);
-		actions = renderer.checkPlayer(false);
-		for (auto action : actions) {
-			if (action.code == pause) { pausedGame(); break; }
-			else if (action.code == reset) resetField();
-		}
-		_ftime_s(&Q_end);
-		Sleep(delay - NORMALIZE(NONEG(time_to_msec(Q_end) - time_to_msec(Q_st)), delay));
-		frameCounter += 1;
-		if (frameCounter == 15) {
-			_ftime_s(&T_end);
-			currentTPS = 1000 / ((time_to_msec(T_end) - time_to_msec(T_st)) / frameCounter);
-			_ftime_s(&T_st);
-			frameCounter = 0;
-		}
+		gameStatus = gameWork;
+		TimeIt(T_st,
+			renderFrame(true, none);
+			actions = con.getPlayerActions(false);
+			for (auto action : actions) {
+				if (action.code == pause) { pausedGame(); break; }
+				else if (action.code == consoleMode) { consoledGame(); break; }
+				else if (action.code == reset) resetField();
+			}, 
+			T_end);
+		DWORD milsBetFrame = (time_to_msec(T_end) - time_to_msec(T_st));
+		DWORD delay = (TargetDelay - milsBetFrame + (1 * !milsBetFrame));
+		Sleep(delay - delay * (delay > 1000));
 	}
 }
 
 void LifeGame::pausedGame() {
-	isPaused = true;
+	gameStatus = gamePause;
 	std::vector<PlAction> actions;
-	DWORD delay = 1000 / pauseTargetTPS;
 	bool CTRLSTATE = false;
 	bool CTRLPLACE = true;
 	bool quit = false;
-	renderFrame(false, 0, pause);
+
+	renderFrame(false, pause);
 	while (!quit) {
-		actions = renderer.checkPlayer(true);
+		actions = con.getPlayerActions(true);
+		renderFrame(false, pause);
 		for (auto action : actions) {
-			renderFrame(false, 0, pause);
 			if (CTRLSTATE == true && action.ctrlState == false)
 				CTRLSTATE = false;
 			if (action.code == pause) {
@@ -102,27 +104,30 @@ void LifeGame::pausedGame() {
 					logic.clearCell(action.mouseClick.Y, action.mouseClick.X);
 
 			}
-			else if (action.code == mouseClick) {
-				logic.switchCell(action.mouseClick.Y, action.mouseClick.X);
-			}
+			else if (action.code == mouseClick) logic.switchCell(action.mouseClick.Y, action.mouseClick.X);
 			else if (action.code == reset) resetField();
 			else if (action.code == saveFieldToReset) setFieldBlank(logic.getField());
-			else if (action.code == none)
-				action.code = pause;
+			else if (action.code == consoleMode) { consoledGame(); break; }
+			else if (action.code == none) action.code = pause;
 		}
-		//Sleep(delay);
 	}
-	isPaused = false;
+}
+
+void LifeGame::consoledGame() {
+	gameStatus = gameConsole;
+	renderFrame(false, consoleMode);
+	while (true) {
+		printf("CONSOLE");
+	}
 }
 
 void LifeGame::resetField() {
 	logic.clearField();
 }
 
-void LifeGame::renderFrame(const bool& isSimulate, const SHORT& currentTPS, const ConsoleCodes& state) {
+void LifeGame::renderFrame(const bool& isSimulate, const ConsoleCodes& state) {
 	if(isSimulate) logic.simulate();
-	renderer.renderGUI(currentTPS, state);
-	renderer.renderFrame(logic.getField());
+	con.renderConsoleFrame(logic.getField(), state);
 }
 
 bool LifeGame::placeCell(const SHORT& x, const SHORT& y) {

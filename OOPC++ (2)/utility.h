@@ -25,6 +25,7 @@ enum ConsoleCodes {
 	reset,
 	saveFieldToReset,
 	mouseCtrlMove,
+	consoleMode,
 };
 
 std::string consoleCodeToString(const ConsoleCodes&);
@@ -80,7 +81,8 @@ public:
 	Frame(const Field&);
 	Frame(const SHORT&, const SHORT&, const FrameData&);
 	Frame(const SHORT&, const SHORT&);
-	CHAR_T& at(SHORT, SHORT);
+	CHAR_T at(SHORT, SHORT) const;
+	STRING line(SHORT) const;
 	~Frame() = default;
 
 	SHORT width;

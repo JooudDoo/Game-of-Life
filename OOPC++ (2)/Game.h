@@ -1,11 +1,15 @@
 ﻿#pragma once
 #include "utility.h"
-#include "GameRenderer.h"
+#include "Console.h"
 #include "GameLogic.h"
 #include "Parser.h"
 
 #include <sys/timeb.h>
 typedef _timeb sys_time_t;
+
+enum GameState {
+	gameNone, gameWork, gamePause, gameConsole
+};
 
 //TODO гибкое количество клеток с разными правилами и их конвертация в соответствующие иконки
 //TODO при рендере изменять только то что изменяется, а не всё поле ✓
@@ -14,6 +18,7 @@ typedef _timeb sys_time_t;
 //TODO переделать основный цикл игры ✓ (не так как задумывалось)
 //TODO rework state position for mouse handler ✓ (не так как задумывалось)
 //TODO make border for mouse click
+//TODO rework frame render (Performance boost) ✓
 
 class LifeGame {
 	friend LifeGame createGameFFile(const std::string&);
@@ -26,28 +31,30 @@ public:
 	bool setFieldBlank(const Field&);
 	
 	void setUniverseName(const std::string&);
+	void setTargetTPS(const SHORT&);
 	void setGameRule(const GameRule&);
 
-	void runGame(const SHORT& targetTPS);
-	void runGame(const std::string& universeName, const SHORT& targetTPS);
-	void renderFrame(const bool&, const SHORT&, const ConsoleCodes&);
+	void runGame();
+	void renderFrame(const bool&, const ConsoleCodes&);
+
 
 private:
 
-	std::string UniverseName;
+	std::string universeName;
 
 	void pausedGame();
+	void consoledGame();
 	void resetField();
 
 	sys_time_t T_st, T_end;
 	SHORT targetTPS;
-	SHORT pauseTargetTPS;
+	DWORD TargetDelay;
 	GameLogic logic;
-	GameRenderer renderer;
+	Console con;
 	SHORT canvasWidth;
 	SHORT canvasHeight;
 
-	bool isPaused;
+	GameState gameStatus;
 };
 
 LifeGame createGameFFile(const std::string&);

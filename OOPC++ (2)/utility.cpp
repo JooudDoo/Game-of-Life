@@ -17,6 +17,8 @@ std::string consoleCodeToString(const ConsoleCodes& c) {
 		return "mouse mode";
 	case(reset):
 		return "reset field";
+	case(consoleMode):
+		return "console";
 	}
 }
 
@@ -44,20 +46,18 @@ Frame::Frame(const SHORT& iWidth, const SHORT& iHeight) : width(iWidth), height(
 	data.resize(height, STRING(width, EMPTY_CELL));
 }
 
-CHAR_T& Frame::at(SHORT y, SHORT x) {
-	if (y >= height) {
-		y %= height;
-	}
-	if (x >= width) {
-		x %= width;
-	}
-	if (x < 0) {
-		x += width;
-	}
-	if (y < 0) {
-		y += height;
-	}
+CHAR_T Frame::at(SHORT y, SHORT x) const {
+	x += width;
+	y += height;
+	y %= height;
+	x %= width;
 	return data[y][x];
+}
+
+STRING Frame::line(SHORT y) const{
+	y += height;
+	y %= height;
+	return data[y];
 }
 
 Field::Field() : width(FILED_BASE_SIZE), height(FILED_BASE_SIZE) {
