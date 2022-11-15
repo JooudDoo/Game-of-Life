@@ -35,8 +35,7 @@ public:
 	void setGameRule(const GameRule&);
 
 	void runGame();
-	void renderFrame(const bool&, const ConsoleCodes&);
-
+	void renderFrame(const bool&, const ConsoleInteractiveCode&);
 
 private:
 

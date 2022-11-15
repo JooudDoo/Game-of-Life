@@ -4,7 +4,7 @@
 
 static GameRule DEFAULTRULE = { {3}, {2, 3} };
 
-std::string consoleCodeToString(const ConsoleCodes& c) {
+std::string consoleInterCodeToString(const ConsoleInteractiveCode& c) {
 	switch (c) {
 	default:
 	case(none):
@@ -54,7 +54,7 @@ CHAR_T Frame::at(SHORT y, SHORT x) const {
 	return data[y][x];
 }
 
-STRING Frame::line(SHORT y) const{
+STRING Frame::line(SHORT y) const {
 	y += height;
 	y %= height;
 	return data[y];

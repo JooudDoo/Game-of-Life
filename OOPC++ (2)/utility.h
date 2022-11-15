@@ -17,7 +17,7 @@
 #define CP 866
 #endif
 
-enum ConsoleCodes {
+enum ConsoleInteractiveCode {
 	none,
 	quit,
 	pause,
@@ -28,11 +28,16 @@ enum ConsoleCodes {
 	consoleMode,
 };
 
-std::string consoleCodeToString(const ConsoleCodes&);
+enum ConsoleWriteCode {
+	offConMode,
+	NAC, //NotACommand
+};
+
+std::string consoleInterCodeToString(const ConsoleInteractiveCode&);
 
 typedef struct PlAction_S{
 
-	ConsoleCodes code;
+	ConsoleInteractiveCode code;
 	COORD mouseClick;
 	BOOL ctrlState;
 
@@ -40,6 +45,8 @@ typedef struct PlAction_S{
 
 constexpr auto EMPTY_CELL = ' ';//'\xb0';
 constexpr auto OCCUPIED_CELL = '\xdb';
+constexpr auto EMPTY_CELL_ATR = FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED;
+constexpr auto OCCUPIED_CELL_ATR = 0;
 
 constexpr CHAR_T BORDERCORNER = '\xce';
 constexpr CHAR_T BORDERVERTICAL = '\xba';
@@ -55,6 +62,7 @@ enum Cell_T {
 };
 
 typedef std::vector<STRING> FrameData;
+typedef std::vector<std::vector<DWORD>> FrameAtrData;
 typedef std::vector<std::vector<Cell_T>> FieldData;
 
 class Field
@@ -74,6 +82,23 @@ public:
 	FieldData data;
 };
 
+template<typename DataType, typename LineType, typename SymType>
+class FrameBlank
+{
+public:
+	FrameBlank();
+	FrameBlank(const Field&);
+	FrameBlank(const SHORT&, const SHORT&, const DataType&);
+	FrameBlank(const SHORT&, const SHORT&);
+	SymType at(SHORT, SHORT) const;
+	LineType line(SHORT) const;
+	~FrameBlank() = default;
+
+	SHORT width;
+	SHORT height;
+	DataType data;
+};
+
 class Frame
 {
 public:
@@ -90,6 +115,10 @@ public:
 	FrameData data;
 };
 
+//#include "Frame.h"
+//typedef FrameBlank<FrameData, STRING, CHAR_T> Frame;
+//typedef FrameBlank<FrameAtrData, std::vector<DWORD>, DWORD> FrameAtr;
+
 typedef struct GameRule_S {
 	std::vector<SHORT> birth;
 	std::vector<SHORT> stay;
@@ -105,3 +134,4 @@ typedef struct GameData_S {
 
 GameRule ruleFString(const std::string&);
 std::pair<SHORT, SHORT> sizeFString(const std::string&);
+

@@ -3,7 +3,14 @@
 #include <sys/timeb.h>
 typedef _timeb sys_time_t;
 
-constexpr int FRAMESPERMEASURE = 60;
+constexpr int FRAMESPERMEASURE = 30;
+constexpr COORD topLeft = { 0, 0 };
+
+constexpr SHORT consoleWritePadding = 2;
+constexpr auto consoleWriteUserInputPrefix = ">> ";
+
+constexpr auto consoleWriteWarningPrefix = "!! ";
+
 
 typedef struct ConsolePreferences_s {
 	HANDLE cInput;
@@ -18,8 +25,10 @@ typedef struct ConsolePreferences_s {
 
 }ConsolePreferences;
 
+
 class GameRenderer
 {
+	friend class Console;
 public:
 	GameRenderer() = default;
 	GameRenderer(const ConsolePreferences&);
@@ -29,12 +38,14 @@ public:
 
 	void renderFrame(const Frame&);
 	void renderFrame(const Field&);
-	void renderGUI(const SHORT&, const ConsoleCodes&);
+	void renderGUI(const SHORT&, const ConsoleInteractiveCode&);
 
+	void writeWarningToCon(const std::string&);
 
 	void setUniverseName(const std::string&);
 	void setTargetTPS(const SHORT&);
 
+	BOOL isIntMode;
 private:
 	void cleanConsole();
 	void initCanvas();
@@ -45,7 +56,7 @@ private:
 
 	void renderName();
 	void renderTPS(const SHORT& currentTPS);
-	void renderState(const ConsoleCodes&);
+	void renderState(const ConsoleInteractiveCode&);
 	void renderInstruction();
 
 	int64_t frameDiff(const Frame&, const Frame&);
@@ -59,7 +70,7 @@ private:
 	BOOL isInstRendered;
 	std::string universeName;
 	SHORT targetTPS;
-	ConsoleCodes prevState;
+	ConsoleInteractiveCode prevState;
 	SHORT prevTPS;
 };
 
@@ -68,6 +79,7 @@ public:
 	GameInput() = default;
 	GameInput(const ConsolePreferences&);
 	~GameInput() = default;
+	ConsoleWriteCode proccesInput();
 	std::vector<PlAction> checkPlayer(const bool& useMouse);
 private:
 	PlAction keyboardHandler(const KEY_EVENT_RECORD&);
@@ -80,7 +92,10 @@ public:
 	Console();
 	Console(const SHORT&, const SHORT&);
 	std::vector<PlAction> getPlayerActions(const bool&);
-	void renderConsoleFrame(const Frame&, const ConsoleCodes&);
+	void renderConsoleFrame(const Frame&, const ConsoleInteractiveCode&);
+	void consoleWriteProcessed();
+	void switchToConsoleMode();
+	void switchFromConsoleMode();
 
 	GameRenderer gRen;
 	GameInput gInp;
@@ -90,6 +105,7 @@ private:
 
 	void InitConsole();
 	SHORT calculateTPS();
+	SHORT lastConsoleLine;
 
 	sys_time_t T_st;
 	sys_time_t T_end;

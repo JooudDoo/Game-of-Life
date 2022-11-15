@@ -30,7 +30,7 @@ std::vector<PlAction> Console::getPlayerActions(const bool& useMouse) {
     return gInp.checkPlayer(useMouse);
 }
 
-void Console::renderConsoleFrame(const Frame& fr, const ConsoleCodes& state) {
+void Console::renderConsoleFrame(const Frame& fr, const ConsoleInteractiveCode& state) {
     gRen.renderGUI(calculateTPS(), state);
     gRen.renderFrame(fr);
     if (frameCounter == FRAMESPERMEASURE) {
@@ -44,6 +44,23 @@ void Console::renderConsoleFrame(const Frame& fr, const ConsoleCodes& state) {
 SHORT Console::calculateTPS() {
     double milsBetFrame = (time_to_msec(T_end) - time_to_msec(T_st)) / (double)FRAMESPERMEASURE;
     return 1000 / (milsBetFrame+(1*!milsBetFrame));
+}
+
+void Console::switchToConsoleMode() {
+    DWORD fdwMode = ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_OUTPUT;
+    SetConsoleMode(cnPref.cInput, fdwMode);
+    SHORT consoleInY = cnPref.canvasStartPos.Y + cnPref.canvasHeight + 3 + lastConsoleLine;
+    gRen.setCursorPos({ 0, consoleInY });
+}
+
+void Console::switchFromConsoleMode() {
+    DWORD fdwMode = ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT;
+    SetConsoleMode(cnPref.cInput, fdwMode);
+    gRen.setCursorPos(topLeft);
+}
+
+void Console::consoleWriteProcessed() {
+    lastConsoleLine += 1;
 }
 
 void Console::InitConsole() {

@@ -116,16 +116,24 @@ void LifeGame::pausedGame() {
 void LifeGame::consoledGame() {
 	gameStatus = gameConsole;
 	renderFrame(false, consoleMode);
+	con.switchToConsoleMode();
 	while (true) {
-		printf("CONSOLE");
-	}
+		ConsoleWriteCode code = con.gInp.proccesInput();
+		con.consoleWriteProcessed();
+		if (code == offConMode) break;
+		else if (code == NAC) {
+			con.gRen.writeWarningToCon("The command is not recognized");
+			con.consoleWriteProcessed();
+		}
+	};
+	con.switchFromConsoleMode();
 }
 
 void LifeGame::resetField() {
 	logic.clearField();
 }
 
-void LifeGame::renderFrame(const bool& isSimulate, const ConsoleCodes& state) {
+void LifeGame::renderFrame(const bool& isSimulate, const ConsoleInteractiveCode& state) {
 	if(isSimulate) logic.simulate();
 	con.renderConsoleFrame(logic.getField(), state);
 }

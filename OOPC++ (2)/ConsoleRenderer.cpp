@@ -4,8 +4,6 @@
 
 #define WriteConsoleAtr(atr, cout, pos, written) WriteConsoleOutputAttribute(cnPref.cOut, atr, cout, pos, written)
 
-constexpr COORD topLeft = { 0, 0 };
-
 GameRenderer::GameRenderer(const ConsolePreferences& consolePrefs) : cnPref(consolePrefs), isNameRendered(false), isInstRendered(false), targetTPS(0), prevState(none), prevTPS(-1){}
 
 void GameRenderer::prepConsole() {
@@ -45,6 +43,7 @@ void GameRenderer::renderFrame(const Frame& fr) {
     if (fr.height > cnPref.canvasHeight || fr.width > cnPref.canvasWidth) {
         throw std::exception("Unsuitable frame size");
     }
+
     if (frameDiff(fr, prevFrame) > cnPref.canvasSquare/20) {
         renderFrameByLine(fr);
     }
@@ -53,6 +52,13 @@ void GameRenderer::renderFrame(const Frame& fr) {
     }
     setCursorPos(topLeft);
     prevFrame = fr;
+}
+
+void GameRenderer::writeWarningToCon(const std::string& a) {
+    if (isIntMode) return;
+    COUT << std::string(consoleWritePadding, ' ') + consoleWriteWarningPrefix;
+    COUT << a;
+    COUT << std::endl;
 }
 
 int64_t GameRenderer::frameDiff(const Frame& frNext, const Frame& frPrev) {
@@ -94,7 +100,8 @@ void GameRenderer::renderFrame(const Field& fr) {
     renderFrame(frame);
 }
 
-void GameRenderer::renderGUI(const SHORT& currentTPS, const ConsoleCodes& state) {
+void GameRenderer::renderGUI(const SHORT& currentTPS, const ConsoleInteractiveCode& state) {
+    isIntMode = state == consoleMode ? false : true;
     renderName();
     renderInstruction();
     renderTPS(currentTPS);
@@ -120,14 +127,14 @@ void GameRenderer::renderTPS(const SHORT& currentTPS) {
     COUT << "TPS: " << currentTPS << " (target: " << targetTPS << ")";
     prevTPS = currentTPS;
 }
-void GameRenderer::renderState(const ConsoleCodes& state) {
+void GameRenderer::renderState(const ConsoleInteractiveCode& state) {
     if (prevState == state)
         return;
     COORD cursorPointer = { cnPref.menuPos.X, cnPref.menuPos.Y + 2 };
     setCursorPos(cursorPointer);
     COUT << std::string(25, ' ');
     setCursorPos(cursorPointer);
-    COUT << "State: " << consoleCodeToString(state);
+    COUT << "State: " << consoleInterCodeToString(state);
     prevState = state;
 }
 void GameRenderer::renderInstruction() {

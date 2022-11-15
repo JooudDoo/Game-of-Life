@@ -29,6 +29,22 @@ std::vector<PlAction> GameInput::checkPlayer(const bool& useMouse) {
     return state;
 }
 
+ConsoleWriteCode GameInput::proccesInput() {
+    std::string command;
+    COUT << std::string(consoleWritePadding, ' ') + consoleWriteUserInputPrefix;
+    std::getline(std::cin, command);
+
+    if (command == "exit") {
+        return 	offConMode;
+    }
+    if (command == "t 10") {
+
+    }
+
+
+    return NAC;
+}
+
 PlAction GameInput::keyboardHandler(const KEY_EVENT_RECORD& mr) {
     int keyPressed = mr.uChar.AsciiChar;
     switch (keyPressed) {
