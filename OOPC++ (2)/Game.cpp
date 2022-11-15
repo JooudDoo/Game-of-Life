@@ -16,7 +16,7 @@ LifeGame createGameFFile(const std::string& filePath) {
 	GameData preferences = parser.parseUniverseFF(filePath);
 	LifeGame game(preferences.gameField.width, preferences.gameField.height);
 	game.setUniverseName(preferences.name);
-	game.setTargetTPS(144);
+	game.setTargetTPS(244);
 	game.setFieldBlank(preferences.gameField);
 	game.setGameRule(preferences.rule);
 	game.gameStatus = gamePause;
@@ -67,7 +67,7 @@ void LifeGame::runGame() { //REFACTOR THIS
 			}, 
 			T_end);
 		DWORD milsBetFrame = (time_to_msec(T_end) - time_to_msec(T_st));
-		DWORD delay = (TargetDelay - milsBetFrame + (1 * !milsBetFrame));
+		DWORD delay = TargetDelay - milsBetFrame + !milsBetFrame;
 		Sleep(delay - delay * (delay > 1000));
 	}
 }

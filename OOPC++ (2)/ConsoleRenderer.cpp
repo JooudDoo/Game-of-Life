@@ -45,7 +45,7 @@ void GameRenderer::renderFrame(const Frame& fr) {
     if (fr.height > cnPref.canvasHeight || fr.width > cnPref.canvasWidth) {
         throw std::exception("Unsuitable frame size");
     }
-    if (frameDiff(fr, prevFrame) > cnPref.canvasSquare/10) {
+    if (frameDiff(fr, prevFrame) > cnPref.canvasSquare/20) {
         renderFrameByLine(fr);
     }
     else {
