@@ -43,7 +43,8 @@ private:
 
 	void pausedGame();
 	void consoledGame();
-	void resetField();
+	void setBlankField();
+	void clearField();
 
 	sys_time_t T_st, T_end;
 	SHORT targetTPS;

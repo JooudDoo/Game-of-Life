@@ -4,7 +4,7 @@
 
 #define WriteConsoleAtr(atr, cout, pos, written) WriteConsoleOutputAttribute(cnPref.cOut, atr, cout, pos, written)
 
-GameRenderer::GameRenderer(const ConsolePreferences& consolePrefs) : cnPref(consolePrefs), isNameRendered(false), isInstRendered(false), targetTPS(0), prevState(none), prevTPS(-1){}
+GameRenderer::GameRenderer(const ConsolePreferences& consolePrefs) : focusMousePosition(topLeft), cnPref(consolePrefs), isNameRendered(false), isInstRendered(false), targetTPS(0), prevState(none), prevTPS(-1){}
 
 void GameRenderer::prepConsole() {
     cleanConsole();
@@ -18,13 +18,13 @@ void GameRenderer::cleanConsole() {
     GetConsoleScreenBufferInfo(cnPref.cOut, &screen);
 
     FillConsoleOutputCharacterA(
-        cnPref.cOut, ' ', screen.dwSize.X * screen.dwSize.Y, topLeft, &written
+        cnPref.cOut, ' ', screen.dwSize.X * screen.dwSize.Y, focusMousePosition, &written
     );
     FillConsoleOutputAttribute(
         cnPref.cOut, FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE,
-        screen.dwSize.X * screen.dwSize.Y, topLeft, &written
+        screen.dwSize.X * screen.dwSize.Y, focusMousePosition, &written
     );
-    setCursorPos(topLeft);
+    setCursorPos(focusMousePosition);
 }
 
 void GameRenderer::setUniverseName(const std::string& name) {
@@ -50,13 +50,20 @@ void GameRenderer::renderFrame(const Frame& fr) {
     else {
         renderFrameByPix(fr);
     }
-    setCursorPos(topLeft);
+    setCursorPos(focusMousePosition);
     prevFrame = fr;
 }
 
 void GameRenderer::writeWarningToCon(const std::string& a) {
     if (isIntMode) return;
     COUT << std::string(consoleWritePadding, ' ') + consoleWriteWarningPrefix;
+    COUT << a;
+    COUT << std::endl;
+}
+
+void GameRenderer::writeAnnotationToCon(const std::string& a) {
+    if (isIntMode) return;
+    COUT << std::string(consoleWritePadding, ' ') + consoleWriteAnnotationPrefix;
     COUT << a;
     COUT << std::endl;
 }
@@ -91,7 +98,7 @@ void GameRenderer::renderFrameByPix(const Frame& fr) {
                 COUT << fr.at(line, x);
             }
         }
-        setCursorPos(topLeft);
+        setCursorPos(focusMousePosition);
     }
 }
 
@@ -106,7 +113,7 @@ void GameRenderer::renderGUI(const SHORT& currentTPS, const ConsoleInteractiveCo
     renderInstruction();
     renderTPS(currentTPS);
     renderState(state);
-    setCursorPos(topLeft);
+    setCursorPos(focusMousePosition);
 }
 
 void GameRenderer::renderName() {
@@ -210,4 +217,8 @@ bool GameRenderer::setCursorPos(const COORD& pos) {
 void GameRenderer::drawSymbol(const SHORT& x,const SHORT& y, CHAR_T sym) {
     setCursorPos({x, y});
     COUT << sym;
+}
+
+void GameRenderer::setFocusMousePosition(const COORD& newPos) {
+    focusMousePosition = newPos;
 }

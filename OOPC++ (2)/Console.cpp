@@ -51,12 +51,14 @@ void Console::switchToConsoleMode() {
     SetConsoleMode(cnPref.cInput, fdwMode);
     SHORT consoleInY = cnPref.canvasStartPos.Y + cnPref.canvasHeight + 3 + lastConsoleLine;
     gRen.setCursorPos({ 0, consoleInY });
+    gRen.setFocusMousePosition({ 0, consoleInY });
 }
 
 void Console::switchFromConsoleMode() {
     DWORD fdwMode = ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT;
     SetConsoleMode(cnPref.cInput, fdwMode);
     gRen.setCursorPos(topLeft);
+    gRen.setFocusMousePosition(topLeft);
 }
 
 void Console::consoleWriteProcessed() {

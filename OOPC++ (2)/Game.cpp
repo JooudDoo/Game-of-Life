@@ -1,4 +1,5 @@
 ﻿#include "Game.h"
+#include <format>
 
 #define TimeIt(st,code,  ed) _ftime_s(&st); \
 							code; \
@@ -63,7 +64,7 @@ void LifeGame::runGame() { //REFACTOR THIS
 			for (auto action : actions) {
 				if (action.code == pause) { pausedGame(); break; }
 				else if (action.code == consoleMode) { consoledGame(); break; }
-				else if (action.code == reset) resetField();
+				else if (action.code == reset) setBlankField();
 			}, 
 			T_end);
 		DWORD milsBetFrame = (time_to_msec(T_end) - time_to_msec(T_st));
@@ -105,7 +106,7 @@ void LifeGame::pausedGame() {
 
 			}
 			else if (action.code == mouseClick) logic.switchCell(action.mouseClick.Y, action.mouseClick.X);
-			else if (action.code == reset) resetField();
+			else if (action.code == reset) setBlankField();
 			else if (action.code == saveFieldToReset) setFieldBlank(logic.getField());
 			else if (action.code == consoleMode) { consoledGame(); break; }
 			else if (action.code == none) action.code = pause;
@@ -117,19 +118,43 @@ void LifeGame::consoledGame() {
 	gameStatus = gameConsole;
 	renderFrame(false, consoleMode);
 	con.switchToConsoleMode();
+	std::pair<ConsoleWriteCode, std::string> consoleCommand;
 	while (true) {
-		ConsoleWriteCode code = con.gInp.proccesInput();
+		consoleCommand = con.gInp.proccesInput();
 		con.consoleWriteProcessed();
-		if (code == offConMode) break;
-		else if (code == NAC) {
+		if (consoleCommand.first == offConMode) break;
+		else if (consoleCommand.first == NAC) {
 			con.gRen.writeWarningToCon("The command is not recognized");
 			con.consoleWriteProcessed();
+		}
+		else if (consoleCommand.first == tickSkip) {
+			int tickToPass = std::stoi(consoleCommand.second);
+			if (tickToPass == -1) {
+				con.gRen.writeWarningToCon("Invalid argument");
+				con.consoleWriteProcessed();
+			}
+			else {
+				logic.simulateTicks(tickToPass);
+				con.gRen.writeAnnotationToCon(std::format("Successfully simulated {} ticks", tickToPass));
+				con.consoleWriteProcessed();
+			}
+			renderFrame(false, consoleMode);
+			con.switchToConsoleMode();
+		}
+		else if (consoleCommand.first == loadBlankField) {
+			clearField();
+			renderFrame(false, consoleMode);
+			con.switchToConsoleMode();
 		}
 	};
 	con.switchFromConsoleMode();
 }
 
-void LifeGame::resetField() {
+void LifeGame::setBlankField() {
+	logic.loadBlankField();
+}
+
+void LifeGame::clearField() {
 	logic.clearField();
 }
 

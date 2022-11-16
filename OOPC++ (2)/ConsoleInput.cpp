@@ -1,6 +1,14 @@
 #include "Console.h"
 #include <iostream>
 #include <conio.h>
+#include <regex>
+
+inline bool isNumber(std::string line)
+{
+    char* p;
+    strtol(line.c_str(), &p, 10);
+    return *p == 0;
+}
 
 #define CTRLSTATE(x) (bool(x.dwControlKeyState & LEFT_CTRL_PRESSED))
 
@@ -29,20 +37,39 @@ std::vector<PlAction> GameInput::checkPlayer(const bool& useMouse) {
     return state;
 }
 
-ConsoleWriteCode GameInput::proccesInput() {
+/*
+* pass some ticks
+* exit
+* switch target tps
+* dump to file
+* load from file
+* switch name
+* clear field
+* help
+*/
+std::pair<ConsoleWriteCode, std::string> GameInput::proccesInput() {
     std::string command;
     COUT << std::string(consoleWritePadding, ' ') + consoleWriteUserInputPrefix;
     std::getline(std::cin, command);
 
-    if (command == "exit") {
-        return 	offConMode;
+    std::regex re("[ ,;.|]");
+    std::sregex_token_iterator first{ command.begin(), command.end(), re, -1 }, last;
+    std::vector<std::string> params{ first, last };
+
+    if (params[0] == "exit") {
+        return { offConMode, ""};
     }
-    if (command == "t 10") {
-
+    if (params[0] == "tick") {
+        if (params.size() >= 2 && isNumber(params[1]))
+            return { tickSkip, params[1] };
+        else
+            return { tickSkip, "-1" };
+    }
+    if (params[0] == "clear") {
+        return { loadBlankField, "" };
     }
 
-
-    return NAC;
+    return { NAC, ""};
 }
 
 PlAction GameInput::keyboardHandler(const KEY_EVENT_RECORD& mr) {

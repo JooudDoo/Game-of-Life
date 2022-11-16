@@ -49,6 +49,12 @@ void GameLogic::simulate() {
 	gameField = newField;
 }
 
+void GameLogic::simulateTicks(const int& tickToPass) {
+	for (int tick = 0; tick < tickToPass; tick++) {
+		simulate();
+	}
+}
+
 SHORT GameLogic::checkAliveSquare(const SHORT& iY, const SHORT& iX) {
 	SHORT cntCellsAround = 0 - gameField.at(iY + 1, iX + 1);
 	for (SHORT line = iY; line < iY + 3; line++) {
@@ -95,6 +101,10 @@ bool GameLogic::setBlankField(const Field& newBlank) {
 	return true;
 }
 
-void GameLogic::clearField() {
+void GameLogic::loadBlankField() {
 	gameField = blankField;
+}
+
+void GameLogic::clearField() {
+	gameField = Field(width, height);
 }

@@ -9,12 +9,14 @@ public:
 	~GameLogic() = default;
 
 	void simulate();
+	void simulateTicks(const int&);
 
 	bool isEmptyCell(const SHORT& x, const SHORT& y);
 	bool switchCell(const SHORT& x, const SHORT& y);
 	bool placeCell(const SHORT& x, const SHORT& y);
 	bool clearCell(const SHORT& x, const SHORT& y);
 	bool setBlankField(const Field&);
+	void loadBlankField();
 	void clearField();
 
 	void setRule(const GameRule&);

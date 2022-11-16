@@ -31,6 +31,8 @@ enum ConsoleInteractiveCode {
 enum ConsoleWriteCode {
 	offConMode,
 	NAC, //NotACommand
+	tickSkip,
+	loadBlankField,
 };
 
 std::string consoleInterCodeToString(const ConsoleInteractiveCode&);
