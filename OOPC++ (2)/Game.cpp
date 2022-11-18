@@ -1,5 +1,6 @@
 ﻿#include "Game.h"
 #include <format>
+#include <sstream>
 
 #define TimeIt(st,code,  ed) _ftime_s(&st); \
 							code; \
@@ -123,35 +124,41 @@ void LifeGame::consoledGame() {
 		consoleCommand = con.gInp.proccesInput();
 		con.consoleWriteProcessed();
 		if (consoleCommand.first == offConMode) break;
-		else if (consoleCommand.first == NAC) {
-			con.gRen.writeWarningToCon("The command is not recognized");
-			con.consoleWriteProcessed();
+		else if (consoleCommand.first == ConsoleWriteCode::NAC) {
+			con.writeLineWithPrefix("This command isn't recognized", consoleWriteWarningPrefix);
 		}
-		else if (consoleCommand.first == tickSkip) {
-			int tickToPass = std::stoi(consoleCommand.second);
+		else if (consoleCommand.first == ConsoleWriteCode::tickSkip) {
+			int tickToPass = -1;
+			if (isNumber(consoleCommand.second)) tickToPass = std::stoi(consoleCommand.second);
 			if (tickToPass == -1) {
-				con.gRen.writeWarningToCon("Invalid argument");
-				con.consoleWriteProcessed();
+				con.writeLineWithPrefix("Invalid argument", consoleWriteWarningPrefix);
 			}
 			else {
 				logic.simulateTicks(tickToPass);
-				con.gRen.writeAnnotationToCon(std::format("Successfully simulated {} ticks", tickToPass));
-				con.consoleWriteProcessed();
+				con.writeLineWithPrefix(std::format("Successfully simulated {} ticks", tickToPass), consoleWriteAnnotationPrefix);
 			}
 			renderFrame(false, consoleMode);
 			con.switchToConsoleMode();
 		}
-		else if (consoleCommand.first == loadBlankField) {
+		else if (consoleCommand.first == ConsoleWriteCode::cleanField) {
 			clearField();
 			renderFrame(false, consoleMode);
 			con.switchToConsoleMode();
+			con.writeLineWithPrefix("Field has been cleared successfully", consoleWriteAnnotationPrefix);
+		}
+		else if (consoleCommand.first == ConsoleWriteCode::help) {
+			con.writeLineWithPrefix("\t\tHelp", consoleWriteHelpPrefix);
+			for (auto al : aliasesForWriteCodes) {
+				con.writeLineWithPrefix(al.helpPopUp, consoleWriteHelpPrefix);
+			}
+
 		}
 	};
 	con.switchFromConsoleMode();
 }
 
 void LifeGame::setBlankField() {
-	logic.loadBlankField();
+	logic.cleanField();
 }
 
 void LifeGame::clearField() {

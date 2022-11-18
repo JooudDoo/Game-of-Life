@@ -1,4 +1,5 @@
 #include "GameLogic.h"
+#include <thread>
 
 static GameRule DEFAULTRULE = { {3}, {2, 3} };
 
@@ -29,6 +30,7 @@ Field& GameLogic::getField() {
 
 void GameLogic::simulate() {
 	Field newField = Field(gameField);
+
 	for (SHORT line = 0; line < height; line++) {
 		for (SHORT x = 0; x < width; x++) {
 			SHORT cntCellsAround = checkAliveSquare(line - 1, x - 1);
@@ -42,7 +44,6 @@ void GameLogic::simulate() {
 					newField.clearCell(line, x);
 				}
 			}
-			
 		}
 
 	}
@@ -101,7 +102,7 @@ bool GameLogic::setBlankField(const Field& newBlank) {
 	return true;
 }
 
-void GameLogic::loadBlankField() {
+void GameLogic::cleanField() {
 	gameField = blankField;
 }
 

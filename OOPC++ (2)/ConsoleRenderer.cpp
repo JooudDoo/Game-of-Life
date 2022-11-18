@@ -44,7 +44,7 @@ void GameRenderer::renderFrame(const Frame& fr) {
         throw std::exception("Unsuitable frame size");
     }
 
-    if (frameDiff(fr, prevFrame) > cnPref.canvasSquare/20) {
+    if (frameDiff(fr, prevFrame) > cnPref.canvasSquare/30) {
         renderFrameByLine(fr);
     }
     else {
@@ -54,17 +54,10 @@ void GameRenderer::renderFrame(const Frame& fr) {
     prevFrame = fr;
 }
 
-void GameRenderer::writeWarningToCon(const std::string& a) {
+void GameRenderer::writeLineWithPrefix(const std::string& line, const char* prefix) {
     if (isIntMode) return;
-    COUT << std::string(consoleWritePadding, ' ') + consoleWriteWarningPrefix;
-    COUT << a;
-    COUT << std::endl;
-}
-
-void GameRenderer::writeAnnotationToCon(const std::string& a) {
-    if (isIntMode) return;
-    COUT << std::string(consoleWritePadding, ' ') + consoleWriteAnnotationPrefix;
-    COUT << a;
+    COUT << std::string(consoleWritePadding, ' ') + prefix;
+    COUT << line;
     COUT << std::endl;
 }
 

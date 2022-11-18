@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ConsoleH___
+#define ConsoleH___
 #include "utility.h"
 #include <sys/timeb.h>
 typedef _timeb sys_time_t;
@@ -8,8 +9,9 @@ constexpr COORD topLeft = { 0, 0 };
 
 constexpr SHORT consoleWritePadding = 2;
 constexpr auto consoleWriteUserInputPrefix = ">> ";
-constexpr auto consoleWriteAnnotationPrefix = "<<< ";
 
+constexpr auto consoleWriteHelpPrefix = "??> ";
+constexpr auto consoleWriteAnnotationPrefix = "<<< ";
 constexpr auto consoleWriteWarningPrefix = "!! ";
 
 
@@ -41,8 +43,7 @@ public:
 	void renderFrame(const Field&);
 	void renderGUI(const SHORT&, const ConsoleInteractiveCode&);
 
-	void writeWarningToCon(const std::string&);
-	void writeAnnotationToCon(const std::string&);
+	void writeLineWithPrefix(const std::string& line, const char* prefix);
 
 	void setUniverseName(const std::string&);
 	void setTargetTPS(const SHORT&);
@@ -97,6 +98,7 @@ public:
 	std::vector<PlAction> getPlayerActions(const bool&);
 	void renderConsoleFrame(const Frame&, const ConsoleInteractiveCode&);
 	void consoleWriteProcessed();
+	void writeLineWithPrefix(const std::string& line, const char* prefix);
 	void switchToConsoleMode();
 	void switchFromConsoleMode();
 
@@ -116,3 +118,5 @@ private:
 	ConsolePreferences cnPref;
 	bool isSetted;
 };
+
+#endif

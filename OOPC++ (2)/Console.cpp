@@ -47,7 +47,7 @@ SHORT Console::calculateTPS() {
 }
 
 void Console::switchToConsoleMode() {
-    DWORD fdwMode = ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_OUTPUT;
+    DWORD fdwMode = ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_OUTPUT | ENABLE_QUICK_EDIT_MODE;
     SetConsoleMode(cnPref.cInput, fdwMode);
     SHORT consoleInY = cnPref.canvasStartPos.Y + cnPref.canvasHeight + 3 + lastConsoleLine;
     gRen.setCursorPos({ 0, consoleInY });
@@ -55,7 +55,7 @@ void Console::switchToConsoleMode() {
 }
 
 void Console::switchFromConsoleMode() {
-    DWORD fdwMode = ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT;
+    DWORD fdwMode = ENABLE_EXTENDED_FLAGS | ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT & ~ENABLE_QUICK_EDIT_MODE;
     SetConsoleMode(cnPref.cInput, fdwMode);
     gRen.setCursorPos(topLeft);
     gRen.setFocusMousePosition(topLeft);
@@ -63,6 +63,11 @@ void Console::switchFromConsoleMode() {
 
 void Console::consoleWriteProcessed() {
     lastConsoleLine += 1;
+}
+
+void Console::writeLineWithPrefix(const std::string& line, const char* prefix) {
+    gRen.writeLineWithPrefix(line, prefix);
+    consoleWriteProcessed();
 }
 
 void Console::InitConsole() {
@@ -75,7 +80,7 @@ void Console::InitConsole() {
     cnPref.canvasSquare = cnPref.canvasHeight * cnPref.canvasWidth;
     SetConsoleTitle(TEXT("Life game"));
     SetConsoleOutputCP(CP);
-    DWORD fdwMode = ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT;
+    DWORD fdwMode = ENABLE_EXTENDED_FLAGS | ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT & ~ENABLE_QUICK_EDIT_MODE;
     SetConsoleMode(cnPref.cInput, fdwMode);
     cnPref.canvasStartPos = { 6, 3 };
     cnPref.menuPos = { cnPref.canvasWidth,  cnPref.canvasStartPos.Y };

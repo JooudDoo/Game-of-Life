@@ -16,7 +16,7 @@ public:
 	bool placeCell(const SHORT& x, const SHORT& y);
 	bool clearCell(const SHORT& x, const SHORT& y);
 	bool setBlankField(const Field&);
-	void loadBlankField();
+	void cleanField();
 	void clearField();
 
 	void setRule(const GameRule&);

@@ -3,12 +3,6 @@
 #include <conio.h>
 #include <regex>
 
-inline bool isNumber(std::string line)
-{
-    char* p;
-    strtol(line.c_str(), &p, 10);
-    return *p == 0;
-}
 
 #define CTRLSTATE(x) (bool(x.dwControlKeyState & LEFT_CTRL_PRESSED))
 
@@ -56,7 +50,17 @@ std::pair<ConsoleWriteCode, std::string> GameInput::proccesInput() {
     std::sregex_token_iterator first{ command.begin(), command.end(), re, -1 }, last;
     std::vector<std::string> params{ first, last };
 
-    if (params[0] == "exit") {
+    if (params.size() == 1){
+        params.push_back("-1");
+    }
+
+    for (auto codeAliases : aliasesForWriteCodes) {
+        auto isFound = find(codeAliases.alias.begin(), codeAliases.alias.end(), params[0]);
+        if (isFound != codeAliases.alias.end())
+            return { codeAliases.code, params[1] };
+    }
+
+   /* if (params[0] == "exit") {
         return { offConMode, ""};
     }
     if (params[0] == "tick") {
@@ -66,8 +70,8 @@ std::pair<ConsoleWriteCode, std::string> GameInput::proccesInput() {
             return { tickSkip, "-1" };
     }
     if (params[0] == "clear") {
-        return { loadBlankField, "" };
-    }
+        return { cleanField, "" };
+    }*/
 
     return { NAC, ""};
 }

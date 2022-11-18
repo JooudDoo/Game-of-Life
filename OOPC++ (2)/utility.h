@@ -29,10 +29,11 @@ enum ConsoleInteractiveCode {
 };
 
 enum ConsoleWriteCode {
-	offConMode,
 	NAC, //NotACommand
-	tickSkip,
-	loadBlankField,
+	offConMode, //Switch from console mode
+	tickSkip, // Simulate some ticks
+	cleanField, // clean field
+	help, //Show help annotation to all commands
 };
 
 std::string consoleInterCodeToString(const ConsoleInteractiveCode&);
@@ -66,6 +67,26 @@ enum Cell_T {
 typedef std::vector<STRING> FrameData;
 typedef std::vector<std::vector<DWORD>> FrameAtrData;
 typedef std::vector<std::vector<Cell_T>> FieldData;
+
+typedef struct CommandAlias_S {
+	std::vector<std::string> alias;
+	ConsoleWriteCode code;
+	std::string helpPopUp;
+}CommandAlias;
+
+static std::vector<CommandAlias> aliasesForWriteCodes({
+	{{"exit", "-e", "quit", "off"}, offConMode, "To exit console mode: "},
+	{{"clean", "cleanField", "-cF", "-cf"}, cleanField, "To clear the field of the universe : "},
+	{{"tick", "-t", "tickSkip", "ticks", "-tick"}, tickSkip, "To simulate N frames in offline mode: "},
+	{{"help", "-h"}, help, "Show this message: "}
+	});
+
+inline bool isNumber(std::string line)
+{
+	char* p = NULL;
+	strtol(line.c_str(), &p, 10);
+	return *p == NULL;
+}
 
 class Field
 {
