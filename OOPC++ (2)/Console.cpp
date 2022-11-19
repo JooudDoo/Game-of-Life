@@ -31,9 +31,11 @@ std::vector<PlAction> Console::getPlayerActions(const bool& useMouse) {
 }
 
 void Console::renderConsoleFrame(const Frame& fr, const ConsoleInteractiveCode& state) {
-    gRen.renderGUI(calculateTPS(), state);
+    gRen.renderGUI(currentFPS, state);
     gRen.renderFrame(fr);
-    if (frameCounter == FRAMESPERMEASURE) {
+    int frameMeasure = gRen.targetFPS / 10 + 1;
+    if (frameCounter >= frameMeasure) {
+        currentFPS = calculateFPS();
         T_st = T_end;
         _ftime_s(&T_end);
         frameCounter = 0;
@@ -41,9 +43,10 @@ void Console::renderConsoleFrame(const Frame& fr, const ConsoleInteractiveCode& 
     frameCounter++;
 }
 
-SHORT Console::calculateTPS() {
-    double milsBetFrame = (time_to_msec(T_end) - time_to_msec(T_st)) / (double)FRAMESPERMEASURE;
-    return 1000 / (milsBetFrame+(1*!milsBetFrame));
+SHORT Console::calculateFPS() {
+    double frameMeasure = gRen.targetFPS / 10 + 1;
+    double milsBetFrame = (time_to_msec(T_end) - time_to_msec(T_st)) / frameMeasure;
+    return 1000 / (milsBetFrame + !milsBetFrame);
 }
 
 void Console::switchToConsoleMode() {
@@ -63,6 +66,12 @@ void Console::switchFromConsoleMode() {
 
 void Console::consoleWriteProcessed() {
     lastConsoleLine += 1;
+}
+
+void Console::clearWriteConsole() {
+    gRen.clearWriteConsole(lastConsoleLine);
+    lastConsoleLine = 0;
+    switchToConsoleMode();
 }
 
 void Console::writeLineWithPrefix(const std::string& line, const char* prefix) {

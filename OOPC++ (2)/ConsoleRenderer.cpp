@@ -4,15 +4,25 @@
 
 #define WriteConsoleAtr(atr, cout, pos, written) WriteConsoleOutputAttribute(cnPref.cOut, atr, cout, pos, written)
 
-GameRenderer::GameRenderer(const ConsolePreferences& consolePrefs) : focusMousePosition(topLeft), cnPref(consolePrefs), isNameRendered(false), isInstRendered(false), targetTPS(0), prevState(none), prevTPS(-1){}
+GameRenderer::GameRenderer(const ConsolePreferences& consolePrefs) : focusMousePosition(topLeft), cnPref(consolePrefs), isNameRendered(false), isInstRendered(false), targetFPS(0), prevState(none), prevFPS(-1){}
 
 void GameRenderer::prepConsole() {
-    cleanConsole();
+    clearConsole();
     initCanvas();
     renderBorder();
 }
 
-void GameRenderer::cleanConsole() {
+void GameRenderer::clearWriteConsole(const SHORT& lines) {
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    GetConsoleScreenBufferInfo(cnPref.cOut, &csbi);
+    COORD cursorPos = csbi.dwCursorPosition;
+    SHORT consoleInY = cnPref.canvasStartPos.Y + cnPref.canvasHeight + 3;
+    DWORD count;
+    FillConsoleOutputCharacter(cnPref.cOut, (CHAR_T)' ', lines * cnPref.consoleMaxX, { 0, consoleInY }, &count);
+    setCursorPos(cursorPos);
+}
+
+void GameRenderer::clearConsole() {
     CONSOLE_SCREEN_BUFFER_INFO screen;
     DWORD written;
     GetConsoleScreenBufferInfo(cnPref.cOut, &screen);
@@ -32,8 +42,8 @@ void GameRenderer::setUniverseName(const std::string& name) {
     isNameRendered = false;
 }
 
-void GameRenderer::setTargetTPS(const SHORT& newTargetTPS) {
-    targetTPS = newTargetTPS;
+void GameRenderer::setTargetFPS(const SHORT& newTargetFPS) {
+    targetFPS = newTargetFPS;
 }
 
 void GameRenderer::renderFrame(const Frame& fr) {
@@ -100,11 +110,11 @@ void GameRenderer::renderFrame(const Field& fr) {
     renderFrame(frame);
 }
 
-void GameRenderer::renderGUI(const SHORT& currentTPS, const ConsoleInteractiveCode& state) {
+void GameRenderer::renderGUI(const SHORT& currentFPS, const ConsoleInteractiveCode& state) {
     isIntMode = state == consoleMode ? false : true;
     renderName();
     renderInstruction();
-    renderTPS(currentTPS);
+    renderFPS(currentFPS);
     renderState(state);
     setCursorPos(focusMousePosition);
 }
@@ -114,18 +124,20 @@ void GameRenderer::renderName() {
         return;
     COORD cursorPointer = cnPref.menuPos;
     setCursorPos(cursorPointer);
+    COUT << std::string(36, ' ');
+    setCursorPos(cursorPointer);
     COUT << "  \"" << universeName << "\"";
     isNameRendered = true;
 }
-void GameRenderer::renderTPS(const SHORT& currentTPS) {
-    if (prevTPS == currentTPS)
+void GameRenderer::renderFPS(const SHORT& currentFPS) {
+    if (prevFPS == currentFPS)
         return;
     COORD cursorPointer = { cnPref.menuPos.X, cnPref.menuPos.Y + 1};
     setCursorPos(cursorPointer);
     COUT << std::string(25, ' ');
     setCursorPos(cursorPointer);
-    COUT << "TPS: " << currentTPS << " (target: " << targetTPS << ")";
-    prevTPS = currentTPS;
+    COUT << "FPS: " << currentFPS << " (target: " << targetFPS << ")";
+    prevFPS = currentFPS;
 }
 void GameRenderer::renderState(const ConsoleInteractiveCode& state) {
     if (prevState == state)
@@ -162,7 +174,7 @@ void GameRenderer::renderInstruction() {
     WriteConsoleAtr(&text_atribute, 1, cursorPointer, &l);
 
     cursorPointer.Y += 1;
-    setCursorPos( cursorPointer);
+    setCursorPos(cursorPointer);
     COUT << "Quit";
     WriteConsoleAtr(&text_atribute, 1, cursorPointer, &l);
     isInstRendered = true;

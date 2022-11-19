@@ -33,6 +33,10 @@ enum ConsoleWriteCode {
 	offConMode, //Switch from console mode
 	tickSkip, // Simulate some ticks
 	cleanField, // clean field
+	clearConsole,
+	switchUniverseName,
+	switchTargetFPS,
+	loadFromFile,
 	help, //Show help annotation to all commands
 };
 
@@ -71,14 +75,19 @@ typedef std::vector<std::vector<Cell_T>> FieldData;
 typedef struct CommandAlias_S {
 	std::vector<std::string> alias;
 	ConsoleWriteCode code;
+	SHORT numberParams;
 	std::string helpPopUp;
 }CommandAlias;
 
 static std::vector<CommandAlias> aliasesForWriteCodes({
-	{{"exit", "-e", "quit", "off"}, offConMode, "To exit console mode: "},
-	{{"clean", "cleanField", "-cF", "-cf"}, cleanField, "To clear the field of the universe : "},
-	{{"tick", "-t", "tickSkip", "ticks", "-tick"}, tickSkip, "To simulate N frames in offline mode: "},
-	{{"help", "-h"}, help, "Show this message: "}
+	{{"exit", "quit", "off", "-e"}, ConsoleWriteCode::offConMode, 0, "To exit console mode: "},
+	{{"clean", "cleanField", "-cF", "-cf"}, ConsoleWriteCode::cleanField, 0, "To clear the field of the universe: "},
+	{{"tick", "tickSkip", "ticks", "-tick", "-t"}, ConsoleWriteCode::tickSkip, 1, "To simulate N frames in offline mode: "},
+	{{"name", "newname", "-name", "-n"}, ConsoleWriteCode::switchUniverseName, 1, "To switch universe name to other: "},
+	{{"load", "loadFromFile", "-l"}, ConsoleWriteCode::loadFromFile, 1, "To load universe from file: "},
+	{{"fps", "targetFps", "-fps", "-f"}, ConsoleWriteCode::switchTargetFPS, 1, "To set new target TPS: "},
+	{{"clear", "-c"}, ConsoleWriteCode::clearConsole, 0, "To clear console write: "},
+	{{"help", "-h"}, ConsoleWriteCode::help, 0, "Show this message: "}
 	});
 
 inline bool isNumber(std::string line)

@@ -21,17 +21,18 @@ enum GameState {
 //TODO rework frame render (Performance boost) ✓
 
 class LifeGame {
-	friend LifeGame createGameFFile(const std::string&);
+	friend LifeGame createGameFFile(const std::string& filePath, LifeGame* prevGame);
 public:
 	LifeGame();
 	LifeGame(const SHORT& cWidth, const SHORT& cHeight);
+	~LifeGame() = default;
 
 	bool placeCell(const SHORT& x, const SHORT& y);
 	bool clearCell(const SHORT& x, const SHORT& y);
 	bool setFieldBlank(const Field&);
 	
 	void setUniverseName(const std::string&);
-	void setTargetTPS(const SHORT&);
+	void setTargetFPS(const SHORT&);
 	void setGameRule(const GameRule&);
 
 	void runGame();
@@ -47,7 +48,7 @@ private:
 	void clearField();
 
 	sys_time_t T_st, T_end;
-	SHORT targetTPS;
+	SHORT targetFPS;
 	DWORD TargetDelay;
 	GameLogic logic;
 	Console con;
@@ -57,4 +58,4 @@ private:
 	GameState gameStatus;
 };
 
-LifeGame createGameFFile(const std::string&);
+LifeGame createGameFFile(const std::string& filePath, LifeGame* prevGame = nullptr);

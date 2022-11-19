@@ -1,0 +1,8 @@
+#Life 1.06
+#N Test Universe
+#S 100x50
+#R B1/S0
+0 1
+1 0
+0 1
+1 0

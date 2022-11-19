@@ -13,12 +13,15 @@ inline long long time_to_msec(const sys_time_t& t) {
 	return t.time * 1000LL + t.millitm;
 }
 
-LifeGame createGameFFile(const std::string& filePath) {
+LifeGame createGameFFile(const std::string& filePath, LifeGame* prevGame) {
+	if (prevGame) {
+		prevGame->~LifeGame();
+	}
 	FileParser parser;
 	GameData preferences = parser.parseUniverseFF(filePath);
 	LifeGame game(preferences.gameField.width, preferences.gameField.height);
 	game.setUniverseName(preferences.name);
-	game.setTargetTPS(244);
+	game.setTargetFPS(244);
 	game.setFieldBlank(preferences.gameField);
 	game.setGameRule(preferences.rule);
 	game.gameStatus = gamePause;
@@ -30,10 +33,10 @@ void LifeGame::setUniverseName(const std::string& name) {
 	con.gRen.setUniverseName(universeName);
 }
 
-void LifeGame::setTargetTPS(const SHORT& tps) {
-	targetTPS = tps;
-	TargetDelay = 1000 / (tps+1*!tps);
-	con.gRen.setTargetTPS(tps);
+void LifeGame::setTargetFPS(const SHORT& fps) {
+	targetFPS = fps;
+	TargetDelay = 1000 / (fps+1*!fps);
+	con.gRen.setTargetFPS(fps);
 }
 
 void LifeGame::setGameRule(const GameRule& r) {
@@ -44,12 +47,12 @@ bool LifeGame::setFieldBlank(const Field& fl) {
 	return logic.setBlankField(fl);
 }
 
-LifeGame::LifeGame() : gameStatus(gameNone), canvasHeight(HEIGHTDEFAULT), canvasWidth(WIDTHDEFAULT), logic(WIDTHDEFAULT, HEIGHTDEFAULT), targetTPS(0) {}
+LifeGame::LifeGame() : gameStatus(gameNone), canvasHeight(HEIGHTDEFAULT), canvasWidth(WIDTHDEFAULT), logic(WIDTHDEFAULT, HEIGHTDEFAULT), targetFPS(0) {}
 
-LifeGame::LifeGame(const SHORT& cWidth, const SHORT& cHeight) : con(cWidth, cHeight), gameStatus(gameNone), canvasHeight(cHeight), canvasWidth(cWidth), logic(cWidth, cHeight), targetTPS(0) {}
+LifeGame::LifeGame(const SHORT& cWidth, const SHORT& cHeight) : con(cWidth, cHeight), gameStatus(gameNone), canvasHeight(cHeight), canvasWidth(cWidth), logic(cWidth, cHeight), targetFPS(0) {}
 
 void LifeGame::runGame() { //REFACTOR THIS 
-	setTargetTPS(targetTPS);
+	setTargetFPS(targetFPS);
 	setUniverseName(universeName);
 
 	std::vector<PlAction> actions;
@@ -128,9 +131,9 @@ void LifeGame::consoledGame() {
 			con.writeLineWithPrefix("This command isn't recognized", consoleWriteWarningPrefix);
 		}
 		else if (consoleCommand.first == ConsoleWriteCode::tickSkip) {
-			int tickToPass = -1;
+			int tickToPass = std::stoi(nullConsoleParametr);
 			if (isNumber(consoleCommand.second)) tickToPass = std::stoi(consoleCommand.second);
-			if (tickToPass == -1) {
+			if (tickToPass == std::stoi(nullConsoleParametr)) {
 				con.writeLineWithPrefix("Invalid argument", consoleWriteWarningPrefix);
 			}
 			else {
@@ -146,12 +149,47 @@ void LifeGame::consoledGame() {
 			con.switchToConsoleMode();
 			con.writeLineWithPrefix("Field has been cleared successfully", consoleWriteAnnotationPrefix);
 		}
+		else if (consoleCommand.first == ConsoleWriteCode::clearConsole) {
+			con.clearWriteConsole();
+		}
+		else if (consoleCommand.first == ConsoleWriteCode::switchUniverseName) {
+			setUniverseName(consoleCommand.second);
+			con.writeLineWithPrefix(std::format("New name set successfully: \"{}\"", consoleCommand.second), consoleWriteAnnotationPrefix);
+			renderFrame(false, consoleMode);
+			con.switchToConsoleMode();
+		}
+		else if (consoleCommand.first == ConsoleWriteCode::switchTargetFPS) {
+			int targetFPS = std::stoi(nullConsoleParametr);
+			if (isNumber(consoleCommand.second)) targetFPS = std::stoi(consoleCommand.second);
+			if (targetFPS == std::stoi(nullConsoleParametr) || targetFPS < 0) {
+				con.writeLineWithPrefix("Invalid argument", consoleWriteWarningPrefix);
+			}
+			else {
+				setTargetFPS(targetFPS);
+				renderFrame(false, consoleMode);
+				con.switchToConsoleMode();
+				con.writeLineWithPrefix(std::format("Successfully set new target FPS: {}", targetFPS), consoleWriteAnnotationPrefix);	
+			}
+		}
+		else if (consoleCommand.first == ConsoleWriteCode::loadFromFile) {
+			createGameFFile(consoleCommand.second, this).runGame();
+		}
 		else if (consoleCommand.first == ConsoleWriteCode::help) {
 			con.writeLineWithPrefix("\t\tHelp", consoleWriteHelpPrefix);
 			for (auto al : aliasesForWriteCodes) {
 				con.writeLineWithPrefix(al.helpPopUp, consoleWriteHelpPrefix);
+				std::stringstream aliases;
+				aliases << "\t\t";
+				for (auto alias : al.alias) {
+					aliases << " " << alias;
+					for (SHORT params = 0; params < al.numberParams; params++) {
+						aliases << " " << consoleWriteParameterHelpPopUpSym;
+					}
+					aliases << ",";
+				}
+				aliases.seekp(-1, aliases.cur); aliases << ' ';
+				con.writeLineWithPrefix(aliases.str(), consoleWriteHelpPrefix);
 			}
-
 		}
 	};
 	con.switchFromConsoleMode();

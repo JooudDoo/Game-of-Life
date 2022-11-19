@@ -4,7 +4,6 @@
 #include <sys/timeb.h>
 typedef _timeb sys_time_t;
 
-constexpr int FRAMESPERMEASURE = 30;
 constexpr COORD topLeft = { 0, 0 };
 
 constexpr SHORT consoleWritePadding = 2;
@@ -13,6 +12,9 @@ constexpr auto consoleWriteUserInputPrefix = ">> ";
 constexpr auto consoleWriteHelpPrefix = "??> ";
 constexpr auto consoleWriteAnnotationPrefix = "<<< ";
 constexpr auto consoleWriteWarningPrefix = "!! ";
+
+constexpr auto consoleWriteParameterHelpPopUpSym = "<param>";
+constexpr auto nullConsoleParametr = "-1";
 
 
 typedef struct ConsolePreferences_s {
@@ -46,12 +48,13 @@ public:
 	void writeLineWithPrefix(const std::string& line, const char* prefix);
 
 	void setUniverseName(const std::string&);
-	void setTargetTPS(const SHORT&);
+	void setTargetFPS(const SHORT&);
 
 	void setFocusMousePosition(const COORD&);
 	BOOL isIntMode;
 private:
-	void cleanConsole();
+	void clearConsole();
+	void clearWriteConsole(const SHORT&);
 	void initCanvas();
 	void renderBorder();
 
@@ -59,7 +62,7 @@ private:
 	bool setCursorPos(const COORD&);
 
 	void renderName();
-	void renderTPS(const SHORT& currentTPS);
+	void renderFPS(const SHORT& currentFPS);
 	void renderState(const ConsoleInteractiveCode&);
 	void renderInstruction();
 
@@ -73,9 +76,9 @@ private:
 	BOOL isNameRendered;
 	BOOL isInstRendered;
 	std::string universeName;
-	SHORT targetTPS;
+	SHORT targetFPS;
 	ConsoleInteractiveCode prevState;
-	SHORT prevTPS;
+	SHORT prevFPS;
 };
 
 class GameInput {
@@ -99,6 +102,8 @@ public:
 	void renderConsoleFrame(const Frame&, const ConsoleInteractiveCode&);
 	void consoleWriteProcessed();
 	void writeLineWithPrefix(const std::string& line, const char* prefix);
+
+	void clearWriteConsole();
 	void switchToConsoleMode();
 	void switchFromConsoleMode();
 
@@ -109,8 +114,9 @@ private:
 	int frameCounter;
 
 	void InitConsole();
-	SHORT calculateTPS();
+	SHORT calculateFPS();
 	SHORT lastConsoleLine;
+	SHORT currentFPS;
 
 	sys_time_t T_st;
 	sys_time_t T_end;

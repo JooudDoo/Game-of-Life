@@ -3,7 +3,6 @@
 #include <conio.h>
 #include <regex>
 
-
 #define CTRLSTATE(x) (bool(x.dwControlKeyState & LEFT_CTRL_PRESSED))
 
 GameInput::GameInput(const ConsolePreferences& consolePrefs) : cnPref(consolePrefs) {};
@@ -45,33 +44,20 @@ std::pair<ConsoleWriteCode, std::string> GameInput::proccesInput() {
     std::string command;
     COUT << std::string(consoleWritePadding, ' ') + consoleWriteUserInputPrefix;
     std::getline(std::cin, command);
+    std::regex re("([^ ]*) ?(.*)");
+    std::smatch parsedCommand;
+    std::regex_search(command, parsedCommand, re);
+    std::vector<std::string> params = { parsedCommand[1], parsedCommand[2]};
 
-    std::regex re("[ ,;.|]");
-    std::sregex_token_iterator first{ command.begin(), command.end(), re, -1 }, last;
-    std::vector<std::string> params{ first, last };
-
-    if (params.size() == 1){
-        params.push_back("-1");
+    if (params[1] == "") {
+        params[1] = nullConsoleParametr;
     }
 
     for (auto codeAliases : aliasesForWriteCodes) {
-        auto isFound = find(codeAliases.alias.begin(), codeAliases.alias.end(), params[0]);
+            auto isFound = find(codeAliases.alias.begin(), codeAliases.alias.end(), params[0]);
         if (isFound != codeAliases.alias.end())
             return { codeAliases.code, params[1] };
     }
-
-   /* if (params[0] == "exit") {
-        return { offConMode, ""};
-    }
-    if (params[0] == "tick") {
-        if (params.size() >= 2 && isNumber(params[1]))
-            return { tickSkip, params[1] };
-        else
-            return { tickSkip, "-1" };
-    }
-    if (params[0] == "clear") {
-        return { cleanField, "" };
-    }*/
 
     return { NAC, ""};
 }
