@@ -9,7 +9,7 @@ constexpr COORD topLeft = { 0, 0 };
 constexpr SHORT consoleWritePadding = 2;
 constexpr auto consoleWriteUserInputPrefix = ">> ";
 
-constexpr auto consoleWriteHelpPrefix = "??> ";
+constexpr auto consoleWriteHelpPrefix = "   ";
 constexpr auto consoleWriteAnnotationPrefix = "<<< ";
 constexpr auto consoleWriteWarningPrefix = "!! ";
 
@@ -51,6 +51,7 @@ public:
 	void setTargetFPS(const SHORT&);
 
 	void setFocusMousePosition(const COORD&);
+	COORD getCanvasSize() const;
 	BOOL isIntMode;
 private:
 	void clearConsole();

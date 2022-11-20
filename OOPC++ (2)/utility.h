@@ -36,6 +36,7 @@ enum ConsoleWriteCode {
 	clearConsole,
 	switchUniverseName,
 	switchTargetFPS,
+	dumpToFile,
 	loadFromFile,
 	help, //Show help annotation to all commands
 };
@@ -62,7 +63,7 @@ constexpr CHAR_T BORDERHORIZONTAL = '\xcd';
 constexpr SHORT WIDTHDEFAULT = 25;
 constexpr SHORT HEIGHTDEFAULT = 25;
 
-constexpr SHORT FILED_BASE_SIZE = 15;
+constexpr SHORT FIELD_BASE_SIZE = 15;
 
 enum Cell_T {
 	empty, cell
@@ -85,6 +86,7 @@ static std::vector<CommandAlias> aliasesForWriteCodes({
 	{{"tick", "tickSkip", "ticks", "-tick", "-t"}, ConsoleWriteCode::tickSkip, 1, "To simulate N frames in offline mode: "},
 	{{"name", "newname", "-name", "-n"}, ConsoleWriteCode::switchUniverseName, 1, "To switch universe name to other: "},
 	{{"load", "loadFromFile", "-l"}, ConsoleWriteCode::loadFromFile, 1, "To load universe from file: "},
+	{{"dump", "save", "-d", "-s"}, ConsoleWriteCode::dumpToFile, 1, "Dump universe data to file: "},
 	{{"fps", "targetFps", "-fps", "-f"}, ConsoleWriteCode::switchTargetFPS, 1, "To set new target TPS: "},
 	{{"clear", "-c"}, ConsoleWriteCode::clearConsole, 0, "To clear console write: "},
 	{{"help", "-h"}, ConsoleWriteCode::help, 0, "Show this message: "}

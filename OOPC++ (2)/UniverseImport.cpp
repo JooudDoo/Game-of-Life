@@ -1,26 +1,37 @@
-#include "Parser.h"
+#include "FileWorkers.h"
 #include <iostream>
 #include <filesystem>
+#include <ctime>
+
+static std::string currentDateTime() {
+	std::time_t t = std::time(nullptr);
+	std::tm now;
+	localtime_s(&now, &t);
+
+	char buffer[128];
+	strftime(buffer, sizeof(buffer), "%H%M%S-%m-%d-%Y", &now);
+	return buffer;
+}
 
 namespace fs = std::filesystem;
 GameRule DEFAULTRULE = { {3}, {2, 3} };
 
-
-FileParser::FileParser() {
+UniverseImporter::UniverseImporter() {
+	std::string logFileName = std::format("{}[{}].log", standartImportLogName, currentDateTime());
 	if (!fs::exists(fs::current_path().string() + "\\logs")) {
 		if (!std::filesystem::create_directories(fs::current_path().string() + "\\logs")) {
-			logFile.open("\\log.txt");
+			logFile.open(logFileName);
 			return;
 		}
 	}
-	logFile.open("logs\\log.txt");
+	logFile.open(std::format("logs/{}", logFileName));
 };
 
-FileParser::~FileParser() {
+UniverseImporter::~UniverseImporter() {
 	logFile.close();
 }
 
-GameData FileParser::parseUniverseFF(const std::string& filePath) {
+GameData UniverseImporter::parseUniverseFF(const std::string& filePath) {
 	std::ifstream file(filePath);
 	if (!file.is_open())
 		throw std::exception("File not found");
@@ -74,19 +85,23 @@ GameData FileParser::parseUniverseFF(const std::string& filePath) {
 	while (!file.eof()) {
 		if (!skipNextRead) std::getline(file, line);
 		skipNextRead = false;
-		std::pair<SHORT, SHORT> coord = checkCell(line);
-		if (worldData.gameField.placeCell(coord.second, coord.first)) {
+		std::pair<bool, COORD> coord = checkCell(line);
+		if (coord.first && worldData.gameField.placeCell(coord.second.Y, coord.second.X)) {
 			logFile << "[CELL] \tSuccesufully placed cell at " << line << std::endl;
 		}
 		else {
-			logFile << "[CELL] \tCell already occupied at " << line << std::endl;
+			if(coord.first)
+				logFile << "[CELL] \tCell already occupied at " << line << std::endl;
+			else
+				logFile << "[CELL] \tIncorrect data: " << line << std::endl;
 		}
 	}
 
+	file.close();
 	return worldData;
 }
 
-bool FileParser::checkBlank(const std::string& blank, const std::string& line, std::string& ver) {
+bool UniverseImporter::checkBlank(const std::string& blank, const std::string& line, std::string& ver) {
 	size_t pos = line.find(blank);
 	if (pos == line.npos)
 		return false;
@@ -96,8 +111,8 @@ bool FileParser::checkBlank(const std::string& blank, const std::string& line, s
 	return true;
 }
 
-std::pair<SHORT, SHORT> FileParser::checkCell(const std::string& line) {
-	int m1, m2;
-	sscanf_s(line.c_str(), "%d %d", &m1, &m2);
-	return {m1, m2};
+std::pair<bool, COORD> UniverseImporter::checkCell(const std::string& line) {
+	SHORT m1, m2;
+	if (sscanf_s(line.c_str(), "%hd %hd", &m1, &m2) == EOF) return { false, {0, 0} };
+	return { true, {m1, m2} };
 }

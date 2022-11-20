@@ -17,7 +17,7 @@ LifeGame createGameFFile(const std::string& filePath, LifeGame* prevGame) {
 	if (prevGame) {
 		prevGame->~LifeGame();
 	}
-	FileParser parser;
+	UniverseImporter parser;
 	GameData preferences = parser.parseUniverseFF(filePath);
 	LifeGame game(preferences.gameField.width, preferences.gameField.height);
 	game.setUniverseName(preferences.name);
@@ -174,8 +174,20 @@ void LifeGame::consoledGame() {
 		else if (consoleCommand.first == ConsoleWriteCode::loadFromFile) {
 			createGameFFile(consoleCommand.second, this).runGame();
 		}
+		else if (consoleCommand.first == ConsoleWriteCode::dumpToFile) {
+			UniverseExporter().exportUniverseToFile(
+				consoleCommand.second,
+				universeName,
+				con.gRen.getCanvasSize(),
+				logic.getRule(),
+				logic.getField()
+			);
+			con.writeLineWithPrefix(std::format("Successfully dumped universe to {}", consoleCommand.second), consoleWriteAnnotationPrefix);
+		}
 		else if (consoleCommand.first == ConsoleWriteCode::help) {
+			con.writeLineWithPrefix("", consoleWriteHelpPrefix);
 			con.writeLineWithPrefix("\t\tHelp", consoleWriteHelpPrefix);
+			con.writeLineWithPrefix("", consoleWriteHelpPrefix);
 			for (auto al : aliasesForWriteCodes) {
 				con.writeLineWithPrefix(al.helpPopUp, consoleWriteHelpPrefix);
 				std::stringstream aliases;

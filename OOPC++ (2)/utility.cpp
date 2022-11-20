@@ -60,7 +60,7 @@ STRING Frame::line(SHORT y) const {
 	return data[y];
 }
 
-Field::Field() : width(FILED_BASE_SIZE), height(FILED_BASE_SIZE) {
+Field::Field() : width(FIELD_BASE_SIZE), height(FIELD_BASE_SIZE) {
 	data = FieldData();
 	data.resize(height, std::vector<Cell_T>(width));
 };

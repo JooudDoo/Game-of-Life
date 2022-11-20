@@ -24,6 +24,10 @@ void GameLogic::setRule(const GameRule& r) {
 	rule = r;
 }
 
+GameRule GameLogic::getRule() const {
+	return rule;
+}
+
 Field& GameLogic::getField() {
 	return gameField;
 }

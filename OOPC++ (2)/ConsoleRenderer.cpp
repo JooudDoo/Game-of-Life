@@ -227,3 +227,7 @@ void GameRenderer::drawSymbol(const SHORT& x,const SHORT& y, CHAR_T sym) {
 void GameRenderer::setFocusMousePosition(const COORD& newPos) {
     focusMousePosition = newPos;
 }
+
+COORD GameRenderer::getCanvasSize() const {
+    return { cnPref.canvasWidth, cnPref.canvasHeight };
+}

@@ -2,7 +2,7 @@
 #include "utility.h"
 #include "Console.h"
 #include "GameLogic.h"
-#include "Parser.h"
+#include "FileWorkers.h"
 
 #include <sys/timeb.h>
 typedef _timeb sys_time_t;

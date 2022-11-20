@@ -20,6 +20,7 @@ public:
 	void clearField();
 
 	void setRule(const GameRule&);
+	GameRule getRule() const;
 
 	Field& getField();
 
