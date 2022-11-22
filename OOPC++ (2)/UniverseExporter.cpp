@@ -30,7 +30,7 @@ UniverseExporter::~UniverseExporter() {
 	logFile.close();
 }
 
-bool UniverseExporter::exportUniverseToFile(const std::string& filePath, const std::string& universeName, const COORD& consoleSize, const GameRule& rules, const Field& gameField) {
+bool UniverseExporter::exportUniverseTF(const std::string& filePath, const std::string& universeName, const COORD& consoleSize, const GameRule& rules, const Field& gameField) {
 	std::ofstream exportFile(filePath);
 	exportFile << lifeVerBlank << "1.06" << std::endl;
 	exportFile << lifeNameBlank << universeName << std::endl;

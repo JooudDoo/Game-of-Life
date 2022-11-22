@@ -150,17 +150,14 @@ void GameRenderer::renderState(const ConsoleInteractiveCode& state) {
     prevState = state;
 }
 void GameRenderer::renderInstruction() {
+    int indent = 2;
     if (isInstRendered)
         return;
     WORD text_atribute = COMMON_LVB_UNDERSCORE | COMMON_LVB_LEADING_BYTE | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
     DWORD l;
     COORD cursorPointer = { cnPref.menuPos.X, cnPref.menuPos.Y + 5 };
     cursorPointer.X += 3;
-    setCursorPos( cursorPointer);
-    COUT << "Reset";
-    WriteConsoleAtr(&text_atribute, 1, cursorPointer, &l);
 
-    cursorPointer.Y += 1;
     setCursorPos( cursorPointer);
     COUT << "Pause/unPause";
     WriteConsoleAtr(&text_atribute, 1, cursorPointer, &l);
@@ -168,12 +165,27 @@ void GameRenderer::renderInstruction() {
     WriteConsoleAtr(&text_atribute, 1, cursorPointer, &l);
     cursorPointer.X -= 8;
 
-    cursorPointer.Y += 1;
+    cursorPointer.Y += indent;
     setCursorPos(cursorPointer);
-    COUT << "SaveToReset";
+    COUT << "Console Mode";
     WriteConsoleAtr(&text_atribute, 1, cursorPointer, &l);
 
-    cursorPointer.Y += 1;
+    cursorPointer.Y += indent;
+    setCursorPos(cursorPointer);
+    COUT << "Save pattern";
+    WriteConsoleAtr(&text_atribute, 1, cursorPointer, &l);
+
+    cursorPointer.Y += indent;
+    setCursorPos(cursorPointer);
+    COUT << "Load pattern";
+    WriteConsoleAtr(&text_atribute, 1, cursorPointer, &l);
+
+    cursorPointer.Y += indent;
+    setCursorPos(cursorPointer);
+    COUT << "Reset field";
+    WriteConsoleAtr(&text_atribute, 1, cursorPointer, &l);
+
+    cursorPointer.Y += indent;
     setCursorPos(cursorPointer);
     COUT << "Quit";
     WriteConsoleAtr(&text_atribute, 1, cursorPointer, &l);

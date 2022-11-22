@@ -18,7 +18,7 @@ LifeGame createGameFFile(const std::string& filePath, LifeGame* prevGame) {
 		prevGame->~LifeGame();
 	}
 	UniverseImporter parser;
-	GameData preferences = parser.parseUniverseFF(filePath);
+	GameData preferences = parser.importUniverseFF(filePath);
 	LifeGame game(preferences.gameField.width, preferences.gameField.height);
 	game.setUniverseName(preferences.name);
 	game.setTargetFPS(244);
@@ -36,6 +36,8 @@ void LifeGame::setUniverseName(const std::string& name) {
 void LifeGame::setTargetFPS(const SHORT& fps) {
 	targetFPS = fps;
 	TargetDelay = 1000 / (fps+1*!fps);
+	pauseTargetFPS = 244;
+	pauseTargetDelay = 1000 / pauseTargetFPS;
 	con.gRen.setTargetFPS(fps);
 }
 
@@ -66,9 +68,11 @@ void LifeGame::runGame() { //REFACTOR THIS
 			renderFrame(true, none);
 			actions = con.getPlayerActions(false);
 			for (auto action : actions) {
-				if (action.code == pause) { pausedGame(); break; }
-				else if (action.code == consoleMode) { consoledGame(); break; }
-				else if (action.code == reset) setBlankField();
+				if (action.code == ConsoleInteractiveCode::pause) { pausedGame(); break; }
+				else if (action.code == ConsoleInteractiveCode::consoleMode) { consoledGame(); break; }
+				else if (action.code == ConsoleInteractiveCode::quit) { exit(INTERACTIVE_MODE_EXIT_VAL); }
+				else if (action.code == ConsoleInteractiveCode::loadSavedPattern) setBlankField();
+				else if (action.code == ConsoleInteractiveCode::reset) { clearField(); }
 			}, 
 			T_end);
 		DWORD milsBetFrame = (time_to_msec(T_end) - time_to_msec(T_st));
@@ -80,13 +84,15 @@ void LifeGame::runGame() { //REFACTOR THIS
 void LifeGame::pausedGame() {
 	gameStatus = gamePause;
 	std::vector<PlAction> actions;
+	sys_time_t T_st, T_end;
 	bool CTRLSTATE = false;
 	bool CTRLPLACE = true;
 	bool quit = false;
 
 	renderFrame(false, pause);
 	while (!quit) {
-		actions = con.getPlayerActions(true);
+		TimeIt(T_st,
+			actions = con.getPlayerActions(true);
 		renderFrame(false, pause);
 		for (auto action : actions) {
 			if (CTRLSTATE == true && action.ctrlState == false)
@@ -95,7 +101,7 @@ void LifeGame::pausedGame() {
 				quit = true;
 				break;
 			}
-			else if (action.code == mouseCtrlMove) {
+			else if (action.code == ConsoleInteractiveCode::mouseCtrlMove) {
 				if (CTRLSTATE == false) {
 					CTRLSTATE = true;
 					if (logic.isEmptyCell(action.mouseClick.Y, action.mouseClick.X))
@@ -109,12 +115,18 @@ void LifeGame::pausedGame() {
 					logic.clearCell(action.mouseClick.Y, action.mouseClick.X);
 
 			}
-			else if (action.code == mouseClick) logic.switchCell(action.mouseClick.Y, action.mouseClick.X);
-			else if (action.code == reset) setBlankField();
-			else if (action.code == saveFieldToReset) setFieldBlank(logic.getField());
-			else if (action.code == consoleMode) { consoledGame(); break; }
-			else if (action.code == none) action.code = pause;
-		}
+			else if (action.code == ConsoleInteractiveCode::mouseClick) logic.switchCell(action.mouseClick.Y, action.mouseClick.X);
+			else if (action.code == ConsoleInteractiveCode::reset){ clearField(); }
+			else if (action.code == ConsoleInteractiveCode::loadSavedPattern) setBlankField();
+			else if (action.code == ConsoleInteractiveCode::saveFieldToReset) setFieldBlank(logic.getField());
+			else if (action.code == ConsoleInteractiveCode::consoleMode) { consoledGame(); break; }
+			else if (action.code == ConsoleInteractiveCode::quit) { exit(INTERACTIVE_MODE_EXIT_VAL); }
+			else if (action.code == ConsoleInteractiveCode::none) action.code = pause;
+		}, 
+		T_end);
+		DWORD milsBetFrame = (time_to_msec(T_end) - time_to_msec(T_st));
+		DWORD delay = pauseTargetDelay - milsBetFrame + !milsBetFrame;
+		Sleep(delay - delay * (delay > 1000));
 	}
 }
 
@@ -175,7 +187,7 @@ void LifeGame::consoledGame() {
 			createGameFFile(consoleCommand.second, this).runGame();
 		}
 		else if (consoleCommand.first == ConsoleWriteCode::dumpToFile) {
-			UniverseExporter().exportUniverseToFile(
+			UniverseExporter().exportUniverseTF(
 				consoleCommand.second,
 				universeName,
 				con.gRen.getCanvasSize(),

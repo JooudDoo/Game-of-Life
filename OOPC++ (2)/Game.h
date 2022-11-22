@@ -50,6 +50,8 @@ private:
 	sys_time_t T_st, T_end;
 	SHORT targetFPS;
 	DWORD TargetDelay;
+	SHORT pauseTargetFPS;
+	DWORD pauseTargetDelay;
 	GameLogic logic;
 	Console con;
 	SHORT canvasWidth;

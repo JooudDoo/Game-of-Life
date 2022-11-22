@@ -14,7 +14,7 @@ public:
 	UniverseImporter();
 	~UniverseImporter();
 
-	GameData parseUniverseFF(const std::string&); //parse universe from file [poleznoe]
+	GameData importUniverseFF(const std::string&); //parse universe from file [poleznoe]
 
 private:
 
@@ -29,7 +29,7 @@ public:
 	UniverseExporter();
 	~UniverseExporter();
 
-	bool exportUniverseToFile(const std::string& filePath, const std::string& universeName, const COORD& consoleSize, const GameRule& rules, const Field& gameField);
+	bool exportUniverseTF(const std::string& filePath, const std::string& universeName, const COORD& consoleSize, const GameRule& rules, const Field& gameField);
 
 private:
 	std::ofstream logFile;

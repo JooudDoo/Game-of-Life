@@ -9,8 +9,11 @@ GameInput::GameInput(const ConsolePreferences& consolePrefs) : cnPref(consolePre
 
 std::vector<PlAction> GameInput::checkPlayer(const bool& useMouse) {
     std::vector<PlAction> state = { };
-    if (!_kbhit() && !useMouse)
+    DWORD inCount = 0;
+    GetNumberOfConsoleInputEvents(cnPref.cInput, &inCount);
+    if (inCount == 0) {
         return state;
+    }
     INPUT_RECORD irInBuf[128];
     DWORD cNumRead;
     ReadConsoleInput(cnPref.cInput, irInBuf, 128, &cNumRead);
@@ -74,6 +77,9 @@ PlAction GameInput::keyboardHandler(const KEY_EVENT_RECORD& mr) {
     case('r'):
     case('R'):
         return { reset, NULL, CTRLSTATE(mr) };
+    case('l'):
+    case('L'):
+        return { loadSavedPattern, NULL, CTRLSTATE(mr) };
     case('s'):
     case('S'):
         return { saveFieldToReset, NULL, CTRLSTATE(mr) };

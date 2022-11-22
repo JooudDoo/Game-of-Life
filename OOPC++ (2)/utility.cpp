@@ -15,7 +15,7 @@ std::string consoleInterCodeToString(const ConsoleInteractiveCode& c) {
 		return "paused";
 	case(mouseClick):
 		return "mouse mode";
-	case(reset):
+	case(loadSavedPattern):
 		return "reset field";
 	case(consoleMode):
 		return "console";

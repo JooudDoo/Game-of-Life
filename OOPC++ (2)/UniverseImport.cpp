@@ -31,7 +31,7 @@ UniverseImporter::~UniverseImporter() {
 	logFile.close();
 }
 
-GameData UniverseImporter::parseUniverseFF(const std::string& filePath) {
+GameData UniverseImporter::importUniverseFF(const std::string& filePath) {
 	std::ifstream file(filePath);
 	if (!file.is_open())
 		throw std::exception("File not found");
@@ -49,7 +49,7 @@ GameData UniverseImporter::parseUniverseFF(const std::string& filePath) {
 	if(!skipNextRead) std::getline(file, line);
 	if (!checkBlank(lifeNameBlank, line, data)) {
 		logFile << "[NAME] [WARNING] Universe name not found. Using default name." << std::endl;
-		data = "GachiVerse";
+		data = "UniverseVerse";
 		skipNextRead = true;
 	}
 	else {
@@ -101,13 +101,13 @@ GameData UniverseImporter::parseUniverseFF(const std::string& filePath) {
 	return worldData;
 }
 
-bool UniverseImporter::checkBlank(const std::string& blank, const std::string& line, std::string& ver) {
+bool UniverseImporter::checkBlank(const std::string& blank, const std::string& line, std::string& returnValue) {
 	size_t pos = line.find(blank);
 	if (pos == line.npos)
 		return false;
 	char buff[1024] = {0};
 	line.copy(buff, line.length() - blank.length(), blank.length());
-	ver = std::string(buff);
+	returnValue = std::string(buff);
 	return true;
 }
 

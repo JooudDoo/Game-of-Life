@@ -23,6 +23,7 @@ enum ConsoleInteractiveCode {
 	pause,
 	mouseClick,
 	reset,
+	loadSavedPattern,
 	saveFieldToReset,
 	mouseCtrlMove,
 	consoleMode,
@@ -64,6 +65,8 @@ constexpr SHORT WIDTHDEFAULT = 25;
 constexpr SHORT HEIGHTDEFAULT = 25;
 
 constexpr SHORT FIELD_BASE_SIZE = 15;
+
+constexpr int INTERACTIVE_MODE_EXIT_VAL = 1;
 
 enum Cell_T {
 	empty, cell

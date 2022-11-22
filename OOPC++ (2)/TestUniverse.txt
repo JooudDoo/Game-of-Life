@@ -1,8 +1,4 @@
 #Life 1.06
 #N Test Universedsadas
-#S 30x20
+#S 100x50
 #R B1/S0
-1 2 
-3 2
-3123 12312
-12324 423423
