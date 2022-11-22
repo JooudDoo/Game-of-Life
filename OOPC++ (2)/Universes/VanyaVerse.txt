@@ -1,4 +1,4 @@
 #Life 1.06
-#N Test Universedsadas
+#N VanyaVerse
 #S 100x50
 #R B1/S0

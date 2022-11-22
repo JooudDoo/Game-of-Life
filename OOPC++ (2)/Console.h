@@ -27,15 +27,17 @@ typedef struct ConsolePreferences_s {
 	SHORT canvasWidth;
 	COORD canvasStartPos;
 	SHORT canvasSquare;
-
 }ConsolePreferences;
 
+constexpr ConsolePreferences DEFAULT_CNPREF = {
+	NULL, NULL, {0, 0}, 0,0,0,0,{0,0}, 0
+};
 
 class GameRenderer
 {
 	friend class Console;
 public:
-	GameRenderer() = default;
+	GameRenderer();
 	GameRenderer(const ConsolePreferences&);
 	~GameRenderer() = default;
 

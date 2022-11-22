@@ -3,6 +3,6 @@
 #include <iostream>
 
 int main() {
-	LifeGame a = createGameFFile("TestUniverse.txt");
+	LifeGame a = createGameFFile("Universes/DefaultUniverse.txt");
 	a.runGame();
 }

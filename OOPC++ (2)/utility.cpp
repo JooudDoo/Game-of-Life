@@ -1,7 +1,8 @@
 #include "utility.h"
-
+#include <fstream>
 #include <regex>
 
+namespace fs = std::filesystem;
 static GameRule DEFAULTRULE = { {3}, {2, 3} };
 
 std::string consoleInterCodeToString(const ConsoleInteractiveCode& c) {
@@ -145,15 +146,22 @@ std::pair<SHORT, SHORT> sizeFString(const std::string& str) {
 
 	auto seq = birth.begin() + 1;
 	if (seq == birth.end())
-		return {15, 15};
+		return {-1, -1};
 	std::string parse = *seq;
 	sscanf_s(parse.c_str(), "%d", &m1);
 	seq = stay.begin() + 1;
 	if (seq == stay.end())
-		return  { 15, 15 };
+		return  { -1, -1};
 	parse = *seq;
 	sscanf_s(parse.c_str(), "%d", &m2);
 	
-
 	return {m1, m2};
+}
+
+bool isFileExist(const std::string& filePath) {
+	std::ifstream file(filePath);
+	if (!file.is_open())
+		return false;
+	file.close();
+	return true;
 }

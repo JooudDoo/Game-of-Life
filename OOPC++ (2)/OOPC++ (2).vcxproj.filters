@@ -64,6 +64,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="TestUniverse.txt" />
+    <Text Include="Universes\DefaultUniverse.txt" />
   </ItemGroup>
 </Project>

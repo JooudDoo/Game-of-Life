@@ -4,7 +4,9 @@
 
 #define WriteConsoleAtr(atr, cout, pos, written) WriteConsoleOutputAttribute(cnPref.cOut, atr, cout, pos, written)
 
-GameRenderer::GameRenderer(const ConsolePreferences& consolePrefs) : focusMousePosition(topLeft), cnPref(consolePrefs), isNameRendered(false), isInstRendered(false), targetFPS(0), prevState(none), prevFPS(-1){}
+GameRenderer::GameRenderer() : focusMousePosition(topLeft), cnPref(DEFAULT_CNPREF), isIntMode(true), isNameRendered(false), isInstRendered(false), targetFPS(0), prevState(none), prevFPS(-1) {};
+
+GameRenderer::GameRenderer(const ConsolePreferences& consolePrefs) : focusMousePosition(topLeft), cnPref(consolePrefs), isIntMode(true), isNameRendered(false), isInstRendered(false), targetFPS(0), prevState(none), prevFPS(-1){}
 
 void GameRenderer::prepConsole() {
     clearConsole();

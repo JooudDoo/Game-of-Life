@@ -17,11 +17,10 @@ LifeGame createGameFFile(const std::string& filePath, LifeGame* prevGame) {
 	if (prevGame) {
 		prevGame->~LifeGame();
 	}
-	UniverseImporter parser;
-	GameData preferences = parser.importUniverseFF(filePath);
+	GameData preferences = UniverseImporter().importUniverseFF(filePath);
 	LifeGame game(preferences.gameField.width, preferences.gameField.height);
 	game.setUniverseName(preferences.name);
-	game.setTargetFPS(244);
+	game.setTargetFPS(DEFAULT_INITIAL_FPS);
 	game.setFieldBlank(preferences.gameField);
 	game.setGameRule(preferences.rule);
 	game.gameStatus = gamePause;
@@ -35,9 +34,7 @@ void LifeGame::setUniverseName(const std::string& name) {
 
 void LifeGame::setTargetFPS(const SHORT& fps) {
 	targetFPS = fps;
-	TargetDelay = 1000 / (fps+1*!fps);
-	pauseTargetFPS = 244;
-	pauseTargetDelay = 1000 / pauseTargetFPS;
+	targetDelay = 1000 / (fps+1*!fps);
 	con.gRen.setTargetFPS(fps);
 }
 
@@ -49,11 +46,11 @@ bool LifeGame::setFieldBlank(const Field& fl) {
 	return logic.setBlankField(fl);
 }
 
-LifeGame::LifeGame() : gameStatus(gameNone), canvasHeight(HEIGHTDEFAULT), canvasWidth(WIDTHDEFAULT), logic(WIDTHDEFAULT, HEIGHTDEFAULT), targetFPS(0) {}
+LifeGame::LifeGame() : gameStatus(gameNone), canvasHeight(HEIGHTDEFAULT), canvasWidth(WIDTHDEFAULT), logic(WIDTHDEFAULT, HEIGHTDEFAULT), targetFPS(0), targetDelay(0), pauseTargetFPS(DEFAULT_PAUSED_INITIAL_FPS), pauseTargetDelay(1000/pauseTargetFPS) {}
 
-LifeGame::LifeGame(const SHORT& cWidth, const SHORT& cHeight) : con(cWidth, cHeight), gameStatus(gameNone), canvasHeight(cHeight), canvasWidth(cWidth), logic(cWidth, cHeight), targetFPS(0) {}
+LifeGame::LifeGame(const SHORT& cWidth, const SHORT& cHeight) : con(cWidth, cHeight), gameStatus(gameNone), canvasHeight(cHeight), canvasWidth(cWidth), logic(cWidth, cHeight), targetFPS(0), targetDelay(0), pauseTargetFPS(DEFAULT_PAUSED_INITIAL_FPS), pauseTargetDelay(1000 / pauseTargetFPS) {}
 
-void LifeGame::runGame() { //REFACTOR THIS 
+void LifeGame::runGame() {
 	setTargetFPS(targetFPS);
 	setUniverseName(universeName);
 
@@ -75,8 +72,8 @@ void LifeGame::runGame() { //REFACTOR THIS
 				else if (action.code == ConsoleInteractiveCode::reset) { clearField(); }
 			}, 
 			T_end);
-		DWORD milsBetFrame = (time_to_msec(T_end) - time_to_msec(T_st));
-		DWORD delay = TargetDelay - milsBetFrame + !milsBetFrame;
+		DWORD milsBetFrame = DWORD(time_to_msec(T_end) - time_to_msec(T_st));
+		DWORD delay = targetDelay - milsBetFrame + !milsBetFrame;
 		Sleep(delay - delay * (delay > 1000));
 	}
 }
@@ -124,8 +121,8 @@ void LifeGame::pausedGame() {
 			else if (action.code == ConsoleInteractiveCode::none) action.code = pause;
 		}, 
 		T_end);
-		DWORD milsBetFrame = (time_to_msec(T_end) - time_to_msec(T_st));
-		DWORD delay = pauseTargetDelay - milsBetFrame + !milsBetFrame;
+		DWORD milsBetFrame = DWORD(time_to_msec(T_end) - time_to_msec(T_st));
+		DWORD delay = pauseTargetDelay - (milsBetFrame + !milsBetFrame);
 		Sleep(delay - delay * (delay > 1000));
 	}
 }
@@ -184,7 +181,28 @@ void LifeGame::consoledGame() {
 			}
 		}
 		else if (consoleCommand.first == ConsoleWriteCode::loadFromFile) {
-			createGameFFile(consoleCommand.second, this).runGame();
+			if (isFileExist(consoleCommand.second)) {
+				createGameFFile(consoleCommand.second, this).runGame();
+			}
+			else {
+				con.writeLineWithPrefix("Couldn't find file", consoleWriteWarningPrefix);
+			}
+		}
+		else if (consoleCommand.first == ConsoleWriteCode::resizeField) {
+			std::pair<SHORT, SHORT> newSize = sizeFString(consoleCommand.second);
+			if (newSize.first < 0) {
+				con.writeLineWithPrefix("Invalid size argument", consoleWriteWarningPrefix);
+			}
+			else {
+				UniverseExporter().exportUniverseTF(
+					"resizeParams",
+					universeName,
+					{newSize.first, newSize.second},
+					logic.getRule(),
+					logic.getField()
+				);
+				createGameFFile("resizeParams", this).runGame();
+			}
 		}
 		else if (consoleCommand.first == ConsoleWriteCode::dumpToFile) {
 			UniverseExporter().exportUniverseTF(

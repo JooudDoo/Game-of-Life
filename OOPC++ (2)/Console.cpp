@@ -33,7 +33,7 @@ std::vector<PlAction> Console::getPlayerActions(const bool& useMouse) {
 void Console::renderConsoleFrame(const Frame& fr, const ConsoleInteractiveCode& state) {
     gRen.renderGUI(currentFPS, state);
     gRen.renderFrame(fr);
-    int frameMeasure = gRen.targetFPS / 10 + 1;
+    int frameMeasure = gRen.targetFPS / 3 + 1;
     if (frameCounter >= frameMeasure) {
         currentFPS = calculateFPS();
         T_st = T_end;
@@ -44,9 +44,9 @@ void Console::renderConsoleFrame(const Frame& fr, const ConsoleInteractiveCode& 
 }
 
 SHORT Console::calculateFPS() {
-    double frameMeasure = gRen.targetFPS / 10 + 1;
+    double frameMeasure = gRen.targetFPS / 3 + 1;
     double milsBetFrame = (time_to_msec(T_end) - time_to_msec(T_st)) / frameMeasure;
-    return 1000 / (milsBetFrame + !milsBetFrame);
+    return SHORT(1000 / (milsBetFrame + !milsBetFrame));
 }
 
 void Console::switchToConsoleMode() {

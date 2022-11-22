@@ -66,7 +66,12 @@ GameData UniverseImporter::importUniverseFF(const std::string& filePath) {
 	else {
 		logFile << "[SIZE] The field size will be: " << data << std::endl;
 		std::pair<SHORT, SHORT> newSize = sizeFString(data); //TODO smt wrong with line
-		worldData.gameField = Field{ newSize.first, newSize.second };
+		if (newSize.first < 0) {
+			logFile << "[SIZE] [WARNING] The field size was found, but not correct. Default size will be used: " << worldData.gameField.height << "x" << worldData.gameField.width << std::endl;
+		}
+		else {
+			worldData.gameField = Field{ newSize.first, newSize.second };
+		}
 		skipNextRead = false;
 	}
 

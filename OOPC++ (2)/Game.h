@@ -11,6 +11,9 @@ enum GameState {
 	gameNone, gameWork, gamePause, gameConsole
 };
 
+constexpr SHORT DEFAULT_INITIAL_FPS = 60;
+constexpr SHORT DEFAULT_PAUSED_INITIAL_FPS = 244;
+
 //TODO гибкое количество клеток с разными правилами и их конвертация в соответствующие иконки
 //TODO при рендере изменять только то что изменяется, а не всё поле ✓
 //TODO UTF-8 support ✓ (Частично)
@@ -47,9 +50,8 @@ private:
 	void setBlankField();
 	void clearField();
 
-	sys_time_t T_st, T_end;
 	SHORT targetFPS;
-	DWORD TargetDelay;
+	DWORD targetDelay;
 	SHORT pauseTargetFPS;
 	DWORD pauseTargetDelay;
 	GameLogic logic;

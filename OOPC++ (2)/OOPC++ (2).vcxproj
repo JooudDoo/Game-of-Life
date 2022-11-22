@@ -148,7 +148,7 @@
     <ClInclude Include="utility.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="TestUniverse.txt" />
+    <Text Include="Universes\DefaultUniverse.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

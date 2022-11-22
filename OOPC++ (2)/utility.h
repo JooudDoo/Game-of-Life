@@ -39,6 +39,7 @@ enum ConsoleWriteCode {
 	switchTargetFPS,
 	dumpToFile,
 	loadFromFile,
+	resizeField,
 	help, //Show help annotation to all commands
 };
 
@@ -90,7 +91,8 @@ static std::vector<CommandAlias> aliasesForWriteCodes({
 	{{"name", "newname", "-name", "-n"}, ConsoleWriteCode::switchUniverseName, 1, "To switch universe name to other: "},
 	{{"load", "loadFromFile", "-l"}, ConsoleWriteCode::loadFromFile, 1, "To load universe from file: "},
 	{{"dump", "save", "-d", "-s"}, ConsoleWriteCode::dumpToFile, 1, "Dump universe data to file: "},
-	{{"fps", "targetFps", "-fps", "-f"}, ConsoleWriteCode::switchTargetFPS, 1, "To set new target TPS: "},
+	{{"fps", "targetFps", "FPS", "-fps", "-FPS", "-f"}, ConsoleWriteCode::switchTargetFPS, 1, "To set new target TPS: "},
+	{{"resize", "resizeField", "-rF"}, ConsoleWriteCode::resizeField, 1, "To set new sizes for field (Like x/y): "},
 	{{"clear", "-c"}, ConsoleWriteCode::clearConsole, 0, "To clear console write: "},
 	{{"help", "-h"}, ConsoleWriteCode::help, 0, "Show this message: "}
 	});
@@ -98,7 +100,7 @@ static std::vector<CommandAlias> aliasesForWriteCodes({
 inline bool isNumber(std::string line)
 {
 	char* p = NULL;
-	strtol(line.c_str(), &p, 10);
+	if(!strtol(line.c_str(), &p, 10)) return false;
 	return *p == NULL;
 }
 
@@ -170,5 +172,6 @@ typedef struct GameData_S {
 }GameData;
 
 GameRule ruleFString(const std::string&);
+bool isFileExist(const std::string&);
 std::pair<SHORT, SHORT> sizeFString(const std::string&);
 

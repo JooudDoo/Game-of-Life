@@ -1,0 +1,4 @@
+#Life 1.06
+#N Default Universe
+#S 100x50
+#R B3/S23
